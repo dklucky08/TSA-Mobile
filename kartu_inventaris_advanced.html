@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="bg-white p-10 rounded-[2.5rem] shadow-sm border border-gray-200">
+    <div class="flex flex-col md:flex-row md:items-center justify-between mb-10 gap-6">
+        <div class="flex items-center space-x-6">
+            <div class="bg-yellow-100 p-4 rounded-2xl text-3xl">🗂️</div>
+            <div>
+                <div class="flex items-center space-x-3 mb-1">
+                    <h2 class="text-3xl font-black text-slate-800 uppercase tracking-tighter">Kartu Inventaris Barang</h2>
+                    <span class="bg-blue-600 text-white text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest shadow-md">Data per 31 Des 2025</span>
+                </div>
+                <p class="text-slate-500 text-sm font-medium">Sistem Intelijen Aset — Filter Kondisi & Asal Perolehan Aktif.</p> 
+            </div>
+        </div>
+        
+        {% if results %}
+        <a href="/bmd/kartu_inventaris/csv?q={{ query }}&tahun={{ tahun_filter }}&kondisi={{ kondisi_filter }}&asal={{ asal_filter }}" class="bg-slate-900 text-white px-8 py-3 rounded-2xl font-black text-sm shadow-lg hover:bg-black transition flex items-center justify-center">
+            📥 DOWNLOAD HASIL FILTER (CSV)
+        </a>
+        {% endif %}
+    </div>
+
+    <!-- ADVANCED SEARCH & FILTER -->
+    <form action="/bmd/kartu_inventaris" method="GET" class="bg-slate-50 p-8 rounded-[2.5rem] border border-slate-100 mb-10 shadow-inner">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div class="md:col-span-2">
+                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 italic">1. Kata Kunci (Nama/Merk/Kode)</label>
+                <input type="text" name="q" value="{{ query }}" placeholder="Cari aset Jenderal di sini..." class="w-full bg-white border-0 rounded-2xl p-4 shadow-sm focus:ring-2 focus:ring-yellow-500 outline-none font-bold">
+            </div>
+            <div>
+                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 italic">2. Tahun Perolehan</label>
+                <select name="tahun" class="w-full bg-white border-0 rounded-2xl p-4 shadow-sm focus:ring-2 focus:ring-yellow-500 outline-none">
+                    <option value="">-- Semua Tahun --</option>
+                    {% for t in tahuns %}
+                    <option value="{{ t.tahun_pembelian }}" {% if tahun_filter == t.tahun_pembelian %}selected{% endif %}>{{ t.tahun_pembelian }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 italic">3. Kondisi Barang</label>
+                <select name="kondisi" class="w-full bg-white border-0 rounded-2xl p-4 shadow-sm focus:ring-2 focus:ring-yellow-500 outline-none">
+                    <option value="">-- Semua Kondisi --</option>
+                    {% for k in kondisis %}
+                    <option value="{{ k.keadaan }}" {% if kondisi_filter == k.keadaan %}selected{% endif %}>{{ k.keadaan }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="md:col-span-4">
+                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 italic">4. Asal / Cara Perolehan</label>
+                <select name="asal" class="w-full bg-white border-0 rounded-2xl p-4 shadow-sm focus:ring-2 focus:ring-yellow-500 outline-none">
+                    <option value="">-- Semua Asal Perolehan --</option>
+                    {% for a in asals %}
+                    <option value="{{ a.asal_perolehan }}" {% if asal_filter == a.asal_perolehan %}selected{% endif %}>{{ a.asal_perolehan }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <button type="submit" class="w-full mt-8 bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white py-5 rounded-3xl font-black text-xl shadow-2xl transition transform hover:-translate-y-1">
+            🚀 JALANKAN RADAR PENCARIAN ASET
+        </button>
+    </form>
+
+    <!-- RESULTS TABLE -->
+    <div class="overflow-x-auto rounded-[2.5rem] border border-slate-100 shadow-sm overflow-hidden">
+        <table class="min-w-full bg-white">
+            <thead>
+                <tr class="bg-slate-900 text-white text-[10px] uppercase tracking-widest">
+                    <th class="py-6 px-6 text-left">Kode & Reg</th>
+                    <th class="py-6 px-6 text-left">Rincian Barang</th>
+                    <th class="py-6 px-6 text-center">Asal & Kondisi</th>
+                    <th class="py-6 px-6 text-right">Nilai Aset (Rp)</th>
+                </tr>
+            </thead>
+            <tbody class="text-slate-600 text-sm">
+                {% for item in results %}
+                <tr class="border-b border-slate-50 hover:bg-blue-50/50 transition group">
+                    <td class="py-5 px-6">
+                        <p class="font-black text-slate-800">{{ item.kode_barang }}</p>
+                        <p class="text-[10px] text-blue-500 font-bold tracking-widest">REG: {{ item.register }}</p>
+                    </td>
+                    <td class="py-5 px-6">
+                        <p class="font-bold text-slate-800 uppercase">{{ item.nama_barang }}</p>
+                        <p class="text-xs text-slate-400 italic">{{ item.merk_type }}</p>
+                        <p class="text-[9px] text-slate-400 mt-1 uppercase">{{ item.keterangan }}</p>
+                    </td>
+                    <td class="py-5 px-6 text-center">
+                        <span class="block text-[10px] font-black text-slate-500 mb-1 uppercase tracking-tighter">{{ item.asal_perolehan }}</span>
+                        <span class="inline-block px-3 py-1 rounded-full text-[9px] font-black {% if item.keadaan == 'Baik' %}bg-green-100 text-green-700{% elif item.keadaan == 'Rusak Berat' %}bg-red-100 text-red-700{% else %}bg-orange-100 text-orange-700{% endif %}">
+                            {{ item.keadaan }}
+                        </span>
+                        <p class="mt-2 text-xs font-black text-slate-800">TAHUN {{ item.tahun_pembelian }}</p>
+                    </td>
+                    <td class="py-5 px-6 text-right font-mono font-black text-blue-700 text-lg">
+                        {{ "{:,.2f}".format(item.harga).replace(',', 'X').replace('.', ',').replace('X', '.') }}
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="4" class="py-24 text-center">
+                        <div class="opacity-10 text-9xl mb-6">🛰️</div>
+                        <p class="text-slate-400 font-black uppercase tracking-widest text-xs">Radar belum menemukan aset yang cocok, Jendral.</p>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

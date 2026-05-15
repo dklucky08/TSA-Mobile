@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="bg-white p-10 rounded-[2.5rem] shadow-sm border border-gray-200 text-center">
+    <div class="bg-green-50 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-8 shadow-xl border-4 border-white">
+        <span class="text-5xl">📄</span>
+    </div>
+    <h2 class="text-4xl font-black text-slate-800 uppercase tracking-tighter mb-4">Laporan Siap Dicetak!</h2>
+    <p class="text-slate-500 text-lg mb-10 max-w-2xl mx-auto">Seluruh data Undangan, Notulen, Daftar Hadir, dan Foto sudah saya kumpulkan dan saya susun rapi sesuai format surat dinas A4.</p>
+
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 max-w-4xl mx-auto mb-12">
+        <div class="p-4 bg-slate-50 rounded-2xl border border-slate-100">
+            <p class="text-[10px] font-black text-slate-400 uppercase">Undangan</p>
+            <p class="font-bold text-green-600">READY</p>
+        </div>
+        <div class="p-4 bg-slate-50 rounded-2xl border border-slate-100">
+            <p class="text-[10px] font-black text-slate-400 uppercase">Notulensi</p>
+            <p class="font-bold text-green-600">READY</p>
+        </div>
+        <div class="p-4 bg-slate-50 rounded-2xl border border-slate-100">
+            <p class="text-[10px] font-black text-slate-400 uppercase">Daftar Hadir</p>
+            <p class="font-bold text-green-600">READY</p>
+        </div>
+        <div class="p-4 bg-slate-50 rounded-2xl border border-slate-100">
+            <p class="text-[10px] font-black text-slate-400 uppercase">Lampiran Foto</p>
+            <p class="font-bold text-green-600">READY</p>
+        </div>
+    </div>
+
+    <form action="/rapat/generate_docx" method="POST">
+        <button type="submit" class="bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white px-16 py-6 rounded-[2rem] font-black text-2xl shadow-2xl transition transform hover:-translate-y-2 flex items-center mx-auto">
+            <span class="mr-4">📥</span> DOWNLOAD LAPORAN LENGKAP (.DOCX)
+        </button>
+    </form>
+    <p class="mt-8 text-xs text-slate-400 uppercase tracking-widest font-black">Ukuran: A4 | Font: Surat Dinas Standar | Format: Microsoft Word</p>
+</div>
+{% endblock %}

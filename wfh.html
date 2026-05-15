@@ -1,0 +1,182 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div x-data="{ wfhModal: false, reportModal: false, activeWfh: null }">
+    <!-- HEADER SECTION -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8 px-2">
+        <div>
+            <h2 class="text-3xl font-black text-slate-900 uppercase italic tracking-tighter">Manajemen Kerja WFH</h2>
+            <p class="text-[10px] font-black text-sky-500 uppercase tracking-[0.3em]">Rencana & Laporan Pelaksanaan (Naskah Dinas)</p>
+        </div>
+        
+        <button @click="wfhModal = true" class="bg-sky-600 hover:bg-sky-700 text-white px-8 py-4 rounded-2xl font-black shadow-xl shadow-sky-900/10 transition-all transform active:scale-95 flex items-center space-x-3 text-sm">
+            <i class="fas fa-plus-circle"></i>
+            <span>BUAT RENCANA BARU</span>
+        </button>
+    </div>
+
+    <!-- DASHBOARD WFH LIST -->
+    <div class="grid grid-cols-1 gap-6">
+        <div class="professional-box">
+            <div class="p-6 bg-slate-50 border-b border-slate-100 flex justify-between items-center">
+                <h3 class="text-xs font-black text-slate-500 uppercase tracking-widest">Daftar Kegiatan WFH</h3>
+                <span class="text-[9px] font-bold text-slate-400 italic">Maksimal pengisian laporan 1x24 jam pasca rencana</span>
+            </div>
+            
+            <div class="overflow-x-auto">
+                <table class="w-full text-left">
+                    <thead class="bg-white border-b border-slate-50">
+                        <tr class="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                            <th class="p-6">Tanggal WFH</th>
+                            <th class="p-6">Status</th>
+                            <th class="p-6">Rencana Kerja</th>
+                            <th class="p-6">Laporan Hasil</th>
+                            <th class="p-6 text-center">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-50 bg-white">
+                        {% for w in wfh_list %}
+                        <tr class="hover:bg-sky-50/30 transition-all">
+                            <td class="p-6">
+                                <p class="text-sm font-black text-slate-800">{{ w.tgl_wfh }}</p>
+                                <p class="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">Dibuat: {{ w.created_at[:16] }}</p>
+                            </td>
+                            <td class="p-6">
+                                {% if w.status == 'COMPLETED' %}
+                                <span class="bg-emerald-50 text-emerald-600 text-[9px] font-black px-3 py-1 rounded-full border border-emerald-200">SELESAI</span>
+                                {% else %}
+                                <span class="bg-amber-50 text-amber-600 text-[9px] font-black px-3 py-1 rounded-full border border-amber-200 animate-pulse">PENDING LAPORAN</span>
+                                {% endif %}
+                            </td>
+                            <td class="p-6">
+                                <div class="max-w-xs space-y-1">
+                                    {% for item in w.rencana %}
+                                    <p class="text-[11px] font-bold text-slate-600 truncate">• {{ item }}</p>
+                                    {% endfor %}
+                                </div>
+                            </td>
+                            <td class="p-6">
+                                <div class="max-w-xs space-y-1">
+                                    {% if w.laporan %}
+                                        {% for item in w.laporan %}
+                                        <p class="text-[11px] font-bold text-emerald-600 truncate">✓ {{ item }}</p>
+                                        {% endfor %}
+                                    {% else %}
+                                        <p class="text-[10px] font-bold text-slate-300 italic">Belum ada laporan...</p>
+                                    {% endif %}
+                                </div>
+                            </td>
+                            <td class="p-6">
+                                <div class="flex items-center justify-center gap-2">
+                                    <!-- DOWNLOAD RENCANA -->
+                                    <form action="/naskah/wfh/generate_docx" method="POST">
+                                        <input type="hidden" name="id_wfh" value="{{ w.id }}">
+                                        <input type="hidden" name="tipe" value="RENCANA">
+                                        <button type="submit" class="w-9 h-9 flex items-center justify-center rounded-xl bg-sky-50 text-sky-600 border border-sky-100 hover:bg-sky-600 hover:text-white transition-all shadow-sm" title="Download Rencana">
+                                            <i class="fas fa-file-export text-xs"></i>
+                                        </button>
+                                    </form>
+
+                                    <!-- INPUT / DOWNLOAD LAPORAN -->
+                                    {% if w.status == 'PENDING' %}
+                                    <button @click='activeWfh = {{ w|tojson }}; reportModal = true' class="px-3 h-9 flex items-center justify-center rounded-xl bg-amber-500 text-white font-black text-[9px] uppercase shadow-lg shadow-amber-200 hover:bg-amber-600 transition-all">
+                                        ISI LAPORAN
+                                    </button>
+                                    {% else %}
+                                    <form action="/naskah/wfh/generate_docx" method="POST">
+                                        <input type="hidden" name="id_wfh" value="{{ w.id }}">
+                                        <input type="hidden" name="tipe" value="LAPORAN">
+                                        <button type="submit" class="w-9 h-9 flex items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 border border-emerald-100 hover:bg-emerald-600 hover:text-white transition-all shadow-sm" title="Download Laporan">
+                                            <i class="fas fa-check-double text-xs"></i>
+                                        </button>
+                                    </form>
+                                    {% endif %}
+
+                                    <form action="/naskah/wfh/delete/{{ w.id }}" method="POST" onsubmit="return confirm('Hapus permanen data WFH ini?')">
+                                        <button type="submit" class="w-9 h-9 flex items-center justify-center rounded-xl bg-red-50 text-red-300 hover:bg-red-500 hover:text-white transition-all">
+                                            <i class="fas fa-trash-alt text-xs"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% if not wfh_list %}
+                <div class="py-20 text-center">
+                    <i class="fas fa-house-laptop text-5xl text-slate-100 mb-4"></i>
+                    <p class="text-xs font-black text-slate-300 uppercase tracking-widest">Belum Ada Rekam Jejak WFH</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- MODAL BUAT RENCANA -->
+        <div x-show="wfhModal" x-cloak class="fixed inset-0 z-[200] flex items-center justify-center p-6 bg-slate-950/90 backdrop-blur-md">
+            <div class="bg-white w-full max-w-2xl rounded-[3rem] p-10 shadow-2xl relative border-t-8 border-sky-500">
+                <button @click="wfhModal = false" class="absolute right-8 top-8 text-slate-300 text-2xl hover:text-red-500 transition-colors">&times;</button>
+                <h3 class="text-2xl font-black text-slate-900 uppercase mb-2 italic">Misi WFH Baru</h3>
+                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-8">Tentukan target pekerjaan jendral</p>
+                
+                <form action="/naskah/wfh/save" method="POST" class="space-y-6">
+                    <input type="hidden" name="tipe" value="RENCANA">
+                    
+                    <div>
+                        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-2">Tanggal Pelaksanaan</label>
+                        <input type="date" name="tgl_wfh" required value="{{ now_date }}" class="w-full bg-slate-50 border-0 rounded-2xl p-4 font-black text-slate-700 focus:ring-4 focus:ring-sky-500/10">
+                    </div>
+
+                    <div x-data="{ items: [''] }">
+                        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-2">Uraian Rencana Kegiatan</label>
+                        <div class="space-y-3">
+                            <template x-for="(item, index) in items" :key="index">
+                                <div class="flex gap-2">
+                                    <input type="text" name="uraian[]" required x-model="items[index]" placeholder="Contoh: Sinkronisasi Database G-Drive..." class="flex-1 bg-slate-50 border-0 rounded-xl p-4 font-bold text-slate-700">
+                                    <button type="button" @click="if(items.length > 1) items.splice(index, 1)" class="w-12 h-12 flex items-center justify-center rounded-xl bg-red-50 text-red-300 hover:bg-red-500 hover:text-white transition-all"><i class="fas fa-minus"></i></button>
+                                </div>
+                            </template>
+                        </div>
+                        <button type="button" @click="items.push('')" class="mt-4 text-[10px] font-black text-sky-600 uppercase flex items-center hover:text-sky-800 transition-colors">
+                            <i class="fas fa-plus-circle mr-2"></i> TAMBAH POIN KEGIATAN
+                        </button>
+                    </div>
+
+                    <button type="submit" class="w-full bg-sky-600 text-white py-5 rounded-[2rem] font-black text-lg shadow-2xl hover:bg-sky-700 transition transform active:scale-95 uppercase tracking-widest">AKTIFKAN RENCANA</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- MODAL ISI LAPORAN -->
+        <div x-show="reportModal" x-cloak class="fixed inset-0 z-[200] flex items-center justify-center p-6 bg-slate-950/90 backdrop-blur-md">
+            <div class="bg-white w-full max-w-2xl rounded-[3rem] p-10 shadow-2xl relative border-t-8 border-emerald-500">
+                <button @click="reportModal = false" class="absolute right-8 top-8 text-slate-300 text-2xl hover:text-red-500 transition-colors">&times;</button>
+                <h3 class="text-2xl font-black text-slate-900 uppercase mb-2 italic">Laporan Pelaksanaan WFH</h3>
+                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-8" x-text="'Tanggal: ' + (activeWfh ? activeWfh.tgl_wfh : '')"></p>
+                
+                <form action="/naskah/wfh/save" method="POST" class="space-y-6">
+                    <input type="hidden" name="tipe" value="LAPORAN">
+                    <input type="hidden" name="id_wfh" :value="activeWfh ? activeWfh.id : ''">
+                    
+                    <div>
+                        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-2">Hasil / Output Pelaksanaan</label>
+                        <div class="space-y-4">
+                            <template x-if="activeWfh">
+                                <template x-for="(item, index) in activeWfh.rencana" :key="index">
+                                    <div class="p-4 bg-emerald-50 rounded-2xl border border-emerald-100">
+                                        <p class="text-[9px] font-black text-emerald-600 uppercase mb-2" x-text="'Target ' + (index+1) + ': ' + item"></p>
+                                        <input type="text" name="hasil[]" required placeholder="Detail hasil yang dicapai..." class="w-full bg-white border-0 rounded-xl p-3 font-bold text-slate-700 shadow-sm focus:ring-4 focus:ring-emerald-500/10">
+                                    </div>
+                                </template>
+                            </template>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="w-full bg-emerald-600 text-white py-5 rounded-[2rem] font-black text-lg shadow-2xl hover:bg-emerald-700 transition transform active:scale-95 uppercase tracking-widest">SIMPAN & SELESAIKAN</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="bg-white p-10 rounded-[2.5rem] shadow-sm border border-gray-200">
+    <div class="flex items-center space-x-6 mb-10">
+        <div class="bg-blue-100 p-4 rounded-2xl text-3xl">✍️</div>
+        <div>
+            <h2 class="text-3xl font-black text-slate-800 uppercase tracking-tighter">Menu 2 — Notulensi Rapat</h2>
+            <p class="text-slate-500 text-sm font-medium">Mandat 4 Input: Tanggal, Pembahasan, Kesimpulan, Tindak Lanjut.</p> 
+        </div>
+    </div>
+
+    <form action="/rapat/notulen/save" method="POST" class="space-y-8">
+        <!-- 1. Tanggal Tanda Tangan -->
+        <div class="bg-slate-50 p-6 rounded-2xl border border-slate-100">
+            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">1. Tanggal Tanda Tangan [In]</label>
+            <input type="date" id="tgl_picker_notulen" name="tgl_rapat" value="{{ detail.get('tgl_rapat_raw', '') }}" 
+                class="w-full bg-white border-0 rounded-xl p-4 focus:ring-2 focus:ring-blue-500 outline-none font-bold text-slate-700 shadow-sm"
+                onchange="formatDateIndo(this.value)">
+            <p id="tgl_preview_notulen" class="mt-2 px-4 text-[11px] font-black text-blue-600 italic uppercase tracking-tighter">
+                {{ detail.get('tgl_rapat', 'Belum dipilih') }}
+            </p>
+        </div>
+
+        <!-- 2. Pembahasan -->
+        <div>
+            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 px-2">2. I. PEMBAHASAN / JALANNYA RAPAT [In]</label>
+            <textarea name="pembahasan" rows="5" placeholder="Tuliskan jalannya rapat di sini..." class="w-full bg-slate-50 border-0 rounded-2xl p-6 focus:ring-2 focus:ring-blue-500 outline-none">{{ detail.get('pembahasan', '') }}</textarea>
+        </div>
+
+        <!-- 3. Kesimpulan -->
+        <div>
+            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 px-2">3. II. KESIMPULAN [In]</label>
+            <textarea name="kesimpulan" rows="3" placeholder="Ringkasan hasil keputusan..." class="w-full bg-slate-50 border-0 rounded-2xl p-6 focus:ring-2 focus:ring-blue-500 outline-none">{{ detail.get('kesimpulan', '') }}</textarea>
+        </div>
+
+        <!-- 4. Tindak Lanjut -->
+        <div>
+            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 px-2">4. III. TINDAK LANJUT [In]</label>
+            <textarea name="tindak_lanjut" rows="3" placeholder="Aksi nyata selanjutnya..." class="w-full bg-slate-50 border-0 rounded-2xl p-6 focus:ring-2 focus:ring-blue-500 outline-none">{{ detail.get('tindak_lanjut', '') }}</textarea>
+        </div>
+
+        <div class="flex justify-end mt-4">
+            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-12 py-4 rounded-2xl font-black shadow-lg transition transform hover:-translate-y-1">
+                💾 SIMPAN & LANJUT KE DAFTAR HADIR
+            </button>
+        </div>
+    </form>
+</div>
+
+<script>
+    function formatDateIndo(dateStr) {
+        if (!dateStr) return;
+        const date = new Date(dateStr);
+        const days = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
+        const months = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+        document.getElementById('tgl_preview_notulen').innerText = `${days[date.getDay()]}, ${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`;
+    }
+</script>
+{% endblock %}

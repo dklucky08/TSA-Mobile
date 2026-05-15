@@ -1,0 +1,209 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="bg-white p-10 rounded-[2.5rem] shadow-sm border border-gray-200" x-data="{
+    labelModal: false,
+    labelData: { id: null, nama: '', keadaan: 'Baik', catatan: '', foto: '' },
+    openLabel(id) {
+        fetch('/bmd/kartu_inventaris/detail/' + id)
+            .then(r => r.json())
+            .then(data => {
+                this.labelData = {
+                    id: data.id,
+                    nama: data.nama_barang,
+                    keadaan: data.keadaan || 'Baik',
+                    catatan: data.catatan_aset || '-',
+                    foto: data.foto_aset || '-'
+                };
+                this.labelModal = true;
+            });
+    }
+}">
+    <div class="flex flex-col md:flex-row md:items-center justify-between mb-10 gap-6">
+        <div class="flex items-center space-x-6">
+            <div class="bg-yellow-100 p-4 rounded-2xl text-3xl">🗂️</div>
+            <div>
+                <h2 class="text-3xl font-black text-slate-800 uppercase tracking-tighter">Kartu Inventaris Barang</h2>
+                <p class="text-slate-500 text-sm font-medium">Pencarian Cepat & Filter Aset BI per 31 Des 2025.</p> 
+            </div>
+        </div>
+        
+        {% if results %}
+        <a href="/bmd/kartu_inventaris/csv?q={{ query }}&tahun={{ tahun_filter }}&asal={{ asal_filter }}" class="bg-slate-900 text-white px-8 py-3 rounded-2xl font-black text-sm shadow-lg hover:bg-black transition flex items-center justify-center">
+            📥 DOWNLOAD HASIL (CSV)
+        </a>
+        {% endif %}
+    </div>
+
+    <!-- SUMMARY DASHBOARD (FILTER RESULTS) -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+        <div class="bg-blue-600 p-6 rounded-[2rem] text-white shadow-xl shadow-blue-900/20 flex items-center justify-between">
+            <div>
+                <p class="text-[10px] font-black uppercase tracking-widest opacity-70">Total Volume Aset</p>
+                <h3 class="text-3xl font-black mt-1">{{ results|length }} <span class="text-sm font-bold opacity-50 uppercase">Barang</span></h3>
+            </div>
+            <div class="text-4xl opacity-20">📊</div>
+        </div>
+        <div class="bg-slate-900 p-6 rounded-[2rem] text-white shadow-xl shadow-slate-900/20 flex items-center justify-between border border-slate-800">
+            <div>
+                <p class="text-[10px] font-black uppercase tracking-widest text-blue-400">Kumulatif Nilai Aset</p>
+                <h3 class="text-2xl font-black mt-1 text-blue-100">Rp {{ "{:,.2f}".format(total_price|default(0)).replace(',', 'X').replace('.', ',').replace('X', '.') }}</h3>
+            </div>
+            <div class="text-4xl opacity-20">💰</div>
+        </div>
+    </div>
+
+    <!-- SEARCH & FILTER BOX -->
+    <form action="/bmd/kartu_inventaris" method="GET" class="bg-slate-50 p-8 rounded-[2rem] border border-slate-100 mb-10">
+        <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+            <div class="md:col-span-2">
+                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Cari Nama Barang / Kode / Merk</label>
+                <input type="text" name="q" value="{{ query }}" placeholder="Contoh: Laptop, Toyota, 02.02..." class="w-full bg-white border-0 rounded-2xl p-4 shadow-sm focus:ring-2 focus:ring-yellow-500 outline-none">
+            </div>
+            <div>
+                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Kategori KIB</label>
+                <select name="kib" class="w-full bg-white border-0 rounded-2xl p-4 shadow-sm focus:ring-2 focus:ring-yellow-500 outline-none">
+                    <option value="">-- Semua KIB --</option>
+                    {% for k in kib_list %}
+                    <option value="{{ k.kategori_kib }}" {% if kib_filter == k.kategori_kib %}selected{% endif %}>{{ k.kategori_kib }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Tahun</label>
+                <select name="tahun" class="w-full bg-white border-0 rounded-2xl p-4 shadow-sm focus:ring-2 focus:ring-yellow-500 outline-none">
+                    <option value="">-- Semua --</option>
+                    {% for t in tahuns %}
+                    <option value="{{ t.tahun_pembelian }}" {% if tahun_filter == t.tahun_pembelian %}selected{% endif %}>{{ t.tahun_pembelian }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Asal / Cara Perolehan</label>
+                <select name="asal" class="w-full bg-white border-0 rounded-2xl p-4 shadow-sm focus:ring-2 focus:ring-yellow-500 outline-none">
+                    <option value="">-- Semua --</option>
+                    {% for a in asals %}
+                    <option value="{{ a.asal_perolehan }}" {% if asal_filter == a.asal_perolehan %}selected{% endif %}>{{ a.asal_perolehan }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        
+        <div class="flex flex-col md:flex-row md:items-center justify-between mt-6 gap-4">
+            <label class="flex items-center space-x-3 cursor-pointer group">
+                <input type="checkbox" name="f_labeled" value="1" {% if labeled_filter == '1' %}checked{% endif %} class="w-5 h-5 rounded-lg border-slate-300 text-yellow-500 focus:ring-yellow-500">
+                <span class="text-xs font-black text-slate-600 uppercase tracking-widest group-hover:text-yellow-600 transition">🔦 Tampilkan Hanya Barang Berlabel (Audit)</span>
+            </label>
+            <button type="submit" class="bg-yellow-500 hover:bg-yellow-600 text-white px-10 py-4 rounded-2xl font-black text-sm shadow-xl transition transform hover:-translate-y-1">
+                🔍 MULAI PENCARIAN ASET
+            </button>
+        </div>
+    </form>
+
+    <!-- RESULTS TABLE -->
+    <div class="overflow-x-auto rounded-[2rem] border border-slate-100 shadow-sm">
+        <table class="min-w-full bg-white">
+            <thead>
+                <tr class="bg-slate-900 text-white text-[10px] uppercase tracking-widest">
+                    <th class="py-5 px-6 text-left">Kode Barang / Reg</th>
+                    <th class="py-5 px-6 text-left">Nama / Jenis Barang</th>
+                    <th class="py-5 px-6 text-left">Merk / Asal</th>
+                    <th class="py-5 px-6 text-center">Tahun</th>
+                    <th class="py-5 px-6 text-right">Harga (Rp)</th>
+                    <th class="py-5 px-6 text-center">Aksi</th>
+                </tr>
+            </thead>
+            <tbody class="text-slate-600 text-sm">
+                {% for item in results %}
+                {% set is_labeled = (item.keadaan != 'Baik' or (item.catatan_aset and item.catatan_aset != '-') or (item.foto_aset and item.foto_aset != '-')) %}
+                <tr class="border-b border-slate-50 hover:bg-yellow-50/50 transition">
+                    <td class="py-4 px-6">
+                        <p class="font-bold text-slate-800">{{ item.kode_barang }}</p>
+                        <div class="flex items-center space-x-2">
+                            <p class="text-[10px] text-slate-400">Reg: {{ item.register }}</p>
+                            <span class="text-[8px] font-black bg-blue-50 text-blue-600 px-1.5 py-0.5 rounded-md uppercase">{{ item.kategori_kib }}</span>
+                        </div>
+                        {% if item.keadaan != 'Baik' %}
+                        <span class="inline-block mt-1 text-[7px] font-black px-2 py-0.5 rounded bg-red-100 text-red-600 uppercase">{{ item.keadaan }}</span>
+                        {% endif %}
+                    </td>
+                    <td class="py-4 px-6 font-medium">
+                        {{ item.nama_barang }}
+                        {% if item.catatan_aset and item.catatan_aset != '-' %}
+                        <p class="text-[9px] text-slate-400 mt-1 italic"><i class="fas fa-sticky-note mr-1"></i>{{ item.catatan_aset }}</p>
+                        {% endif %}
+                        {% if item.foto_aset and item.foto_aset != '-' %}
+                        <a href="{{ item.foto_aset }}" target="_blank" class="inline-block mt-1 text-[8px] font-black text-blue-500 hover:underline"><i class="fas fa-image mr-1"></i> LIHAT FOTO</a>
+                        {% endif %}
+                    </td>
+                    <td class="py-4 px-6">
+                        <p class="text-xs text-slate-800 font-bold">{{ item.merk_type }}</p>
+                        <p class="text-[9px] text-slate-400 uppercase">{{ item.asal_perolehan }}</p>
+                    </td>
+                    <td class="py-4 px-6 text-center font-black">{{ item.tahun_pembelian }}</td>
+                    <td class="py-4 px-6 text-right font-mono font-black text-blue-600">
+                        {{ "{:,.2f}".format(item.harga).replace(',', 'X').replace('.', ',').replace('X', '.') }}
+                    </td>
+                    <td class="py-4 px-6 text-center">
+                        <button @click="openLabel({{ item.id }})" 
+                                class="w-10 h-10 rounded-xl transition flex items-center justify-center shadow-sm"
+                                :class="'{{ is_labeled }}' == 'True' ? 'bg-yellow-500 text-white shadow-yellow-500/20' : 'bg-slate-100 text-slate-400 hover:bg-yellow-500 hover:text-white'">
+                            <i class="fas fa-tag"></i>
+                        </button>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="6" class="py-20 text-center">
+                        <div class="opacity-20 text-6xl mb-4">🔦</div>
+                        <p class="text-slate-400 font-bold uppercase tracking-widest text-xs">Belum ada data yang dicari, Jendral.</p>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- MODAL LABELLING ASET -->
+    <div x-show="labelModal" x-cloak class="fixed inset-0 z-[120] flex items-center justify-center p-6 bg-slate-950/95 backdrop-blur-md">
+        <div class="bg-white rounded-[3rem] p-10 max-w-xl w-full shadow-2xl border-b-8 border-yellow-500 flex flex-col relative overflow-hidden">
+            <div class="absolute top-0 right-0 p-8">
+                <button @click="labelModal = false" class="text-slate-300 text-3xl hover:text-slate-600 transition">&times;</button>
+            </div>
+            
+            <div class="mb-8">
+                <p class="text-[10px] font-black text-yellow-600 uppercase tracking-widest mb-1">Update Label Strategis</p>
+                <h3 class="text-2xl font-black text-slate-900 uppercase tracking-tighter italic" x-text="labelData.nama"></h3>
+            </div>
+
+            <form :action="'/bmd/kartu_inventaris/label/' + labelData.id" method="POST" class="space-y-6">
+                <div>
+                    <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-2">Kondisi Barang Aktual</label>
+                    <select name="keadaan" x-model="labelData.keadaan" class="w-full bg-slate-50 border-0 rounded-2xl p-4 font-bold text-slate-700 outline-none focus:ring-2 focus:ring-yellow-500">
+                        <option value="Baik">Baik</option>
+                        <option value="Kurang Baik">Kurang Baik</option>
+                        <option value="Rusak Berat">Rusak Berat</option>
+                        <option value="Diketemukan">Diketemukan</option>
+                        <option value="Tidak Diketemukan">Tidak Diketemukan</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-2">Catatan Aset</label>
+                    <textarea name="catatan_aset" x-model="labelData.catatan" rows="3" placeholder="Tambahkan catatan khusus untuk aset ini..." class="w-full bg-slate-50 border-0 rounded-2xl p-4 font-medium text-slate-700 outline-none focus:ring-2 focus:ring-yellow-500"></textarea>
+                </div>
+
+                <div>
+                    <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-2">Link Foto Barang</label>
+                    <input type="text" name="foto_aset" x-model="labelData.foto" placeholder="https://drive.google.com/..." class="w-full bg-slate-50 border-0 rounded-2xl p-4 font-medium text-slate-700 outline-none focus:ring-2 focus:ring-yellow-500">
+                </div>
+
+                <div class="flex space-x-4 pt-4">
+                    <button type="button" @click="labelModal = false" class="flex-1 bg-slate-100 text-slate-400 py-4 rounded-2xl font-black uppercase text-xs">Tutup</button>
+                    <button type="submit" class="flex-[2] bg-yellow-500 text-white py-4 rounded-2xl font-black uppercase text-xs shadow-xl shadow-yellow-900/20 hover:bg-yellow-600 transition transform active:scale-95">Simpan Perubahan Label</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

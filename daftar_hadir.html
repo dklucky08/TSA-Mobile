@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="bg-white p-10 rounded-[2.5rem] shadow-sm border border-gray-200">
+    <div class="flex items-center space-x-6 mb-10">
+        <div class="bg-blue-100 p-4 rounded-2xl text-3xl">👥</div>
+        <div>
+            <h2 class="text-3xl font-black text-slate-800 uppercase tracking-tighter">Menu 3 — Daftar Hadir</h2>
+            <p class="text-slate-500 text-sm font-medium">Atur format tabel tanda tangan manual.</p> 
+        </div>
+    </div>
+
+    <form action="/rapat/daftar_hadir/save" method="POST" class="max-w-2xl mx-auto">
+        <div class="bg-slate-50 p-8 rounded-[2rem] border border-slate-100 mb-8">
+            <div class="mb-8">
+                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 text-center">Tanggal Pelaksanaan [In]</label>
+                <input type="date" id="tgl_picker_dh" name="tgl_rapat" value="{{ detail.get('tgl_rapat_raw', '') }}" 
+                    class="w-full bg-white border-0 rounded-2xl p-4 focus:ring-2 focus:ring-blue-500 outline-none font-black text-center text-slate-700 shadow-sm"
+                    onchange="formatDateIndo(this.value)">
+                <p id="tgl_preview_dh" class="mt-2 text-[11px] font-black text-blue-600 italic uppercase tracking-tighter text-center">
+                    {{ detail.get('tgl_rapat', 'Belum dipilih') }}
+                </p>
+            </div>
+            
+            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-6 text-center">Jumlah Baris Tabel Tanda Tangan</label>
+            <div class="flex items-center justify-center space-x-4">
+                <input type="number" name="jumlah_baris" value="{{ jumlah }}" min="1" max="100" class="w-32 text-center text-4xl font-black bg-white border-0 rounded-3xl p-6 shadow-xl focus:ring-4 focus:ring-blue-500 outline-none text-blue-600">
+                <span class="text-xl font-bold text-slate-400">BARIS</span>
+            </div>
+        </div>
+
+<script>
+    function formatDateIndo(dateStr) {
+        if (!dateStr) return;
+        const date = new Date(dateStr);
+        const days = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
+        const months = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+        const hari = days[date.getDay()];
+        const tgl = date.getDate();
+        const bulan = months[date.getMonth()];
+        const tahun = date.getFullYear();
+        document.getElementById('tgl_preview_dh').innerText = `${hari}, ${tgl} ${bulan} ${tahun}`;
+    }
+</script>
+
+        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-12 py-5 rounded-3xl font-black text-lg shadow-xl transition transform hover:-translate-y-1 w-full">
+            ✅ KUNCI & LANJUT KE FOTO
+        </button>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="bg-white p-10 rounded-[2.5rem] shadow-sm border border-gray-200">
+    <div class="flex items-center space-x-6 mb-10">
+        <div class="bg-blue-100 p-4 rounded-2xl text-3xl text-blue-600">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01m-.01 4h.01"></path></svg>
+        </div>
+        <div>
+            <h2 class="text-3xl font-black text-slate-800 uppercase tracking-tighter">Referensi Mapping Aset</h2>
+            <p class="text-slate-500 text-sm font-medium">Data Sinkronisasi Kode Belanja vs Kode Aset (Sheet 1).</p> 
+        </div>
+    </div>
+
+    <!-- SEARCH BOX -->
+    <form action="/bmd/referensi" method="GET" class="bg-slate-50 p-8 rounded-[2.5rem] border border-slate-100 mb-10 shadow-inner">
+        <div class="flex flex-col md:flex-row gap-4">
+            <input type="text" name="q" value="{{ query }}" placeholder="Cari Kode Belanja / Nama Aset..." class="flex-1 bg-white border-0 rounded-2xl p-4 shadow-sm focus:ring-2 focus:ring-blue-500 outline-none font-bold">
+            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-10 py-4 rounded-2xl font-black text-lg shadow-xl transition transform hover:-translate-y-1">
+                🔍 CARI MAPPING
+            </button>
+        </div>
+    </form>
+
+    <!-- RESULTS TABLE -->
+    <div class="overflow-x-auto rounded-[2.5rem] border border-slate-100 shadow-sm overflow-hidden">
+        <table class="min-w-full bg-white">
+            <thead>
+                <tr class="bg-slate-900 text-white text-[10px] uppercase tracking-widest">
+                    <th class="py-6 px-6 text-left">Kode & Nama Belanja</th>
+                    <th class="py-6 px-6 text-left">Mapping Kode Aset 7</th>
+                    <th class="py-6 px-6 text-left">Nama Aset 7</th>
+                </tr>
+            </thead>
+            <tbody class="text-slate-600 text-sm">
+                {% for item in results %}
+                <tr class="border-b border-slate-50 hover:bg-blue-50/50 transition">
+                    <td class="py-5 px-6">
+                        <p class="font-black text-slate-800">{{ item.kode_belanja }}</p>
+                        <p class="text-[10px] text-slate-400 font-bold uppercase">{{ item.nama_belanja }}</p>
+                    </td>
+                    <td class="py-5 px-6 font-mono font-black text-blue-600">
+                        {{ item.kode_aset_7 }}
+                    </td>
+                    <td class="py-5 px-6 font-bold text-slate-700 uppercase">
+                        {{ item.nama_aset_7 }}
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="3" class="py-24 text-center">
+                        <p class="text-slate-400 font-black uppercase tracking-widest text-xs italic">Gunakan bilah pencarian untuk memetakan aset, Jendral.</p>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

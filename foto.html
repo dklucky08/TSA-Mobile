@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="bg-white p-10 rounded-[2.5rem] shadow-sm border border-gray-200">
+    <div class="flex items-center justify-between mb-10">
+        <div class="flex items-center space-x-6">
+            <div class="bg-blue-100 p-4 rounded-2xl text-3xl">📸</div>
+            <div>
+                <h2 class="text-3xl font-black text-slate-800 uppercase tracking-tighter">Menu 4 — Lampiran Foto Bukti</h2>
+                <p class="text-slate-500 text-sm font-medium">Dokumentasi visual jalannya rapat / kegiatan.</p> 
+            </div>
+        </div>
+    </div>
+
+    <!-- UPLOAD ZONE -->
+    <form action="/rapat/foto/upload" method="POST" enctype="multipart/form-data" class="mb-12">
+        <div class="p-12 border-4 border-dashed border-slate-100 rounded-[3rem] text-center hover:border-blue-400 transition-all bg-slate-50/50 group">
+            <input type="file" name="foto" accept="image/*" capture="environment" required id="foto-input" class="hidden">
+            <label for="foto-input" class="cursor-pointer">
+                <div class="bg-blue-600 text-white w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 shadow-xl group-hover:scale-110 transition">
+                    <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                </div>
+                <p class="text-xl font-bold text-slate-700">Klik untuk Ambil Foto / Upload</p>
+                <p class="text-slate-400 text-sm mt-2 uppercase tracking-widest font-black">Mendukung Kamera HP Langsung</p>
+            </label>
+            <button type="submit" class="mt-8 bg-slate-900 text-white px-10 py-4 rounded-2xl font-black shadow-lg hover:bg-black transition">
+                🚀 SIMPAN FOTO KE SERVER
+            </button>
+        </div>
+    </form>
+
+    <!-- GALLERY PREVIEW -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+        {% for foto in fotos %}
+        <div class="relative group aspect-square rounded-[2rem] overflow-hidden border-4 border-white shadow-md bg-slate-100">
+            <img src="/uploads/foto_rapat/{{ foto.filename }}" class="w-full h-full object-cover">
+            
+            <!-- DELETE BUTTON OVERLAY -->
+            <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-all flex flex-col items-center justify-center space-y-3">
+                <p class="text-white text-[9px] font-black uppercase tracking-tighter">{{ foto.uploaded_at }}</p>
+                <a href="/rapat/foto/delete/{{ foto.id }}" 
+                   onclick="return confirm('Hapus foto ini, Jendral?')"
+                   class="bg-red-600 hover:bg-red-500 text-white p-3 rounded-xl shadow-xl transition transform active:scale-90">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- NAVIGATION TO NEXT STEP -->
+    <div class="mt-12 flex justify-end border-t border-slate-100 pt-8">
+        <a href="/rapat/download" class="bg-green-600 hover:bg-green-700 text-white px-12 py-5 rounded-2xl font-black shadow-xl transition transform hover:-translate-y-1 flex items-center space-x-3">
+            <span>💾 SELESAI & LANJUT KE DOWNLOAD</span>
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+        </a>
+    </div>
+</div>
+{% endblock %}

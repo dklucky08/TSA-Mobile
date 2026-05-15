@@ -1,0 +1,175 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="space-y-6" x-data="{ 
+    vaultModal: false, editModal: false, keyModal: false, 
+    resData: {id: '', kategori: '', nama: '', url: ''},
+    keyData: {id: '', m_id: '', user: '', pass: '', note: ''}
+}">
+    <!-- HEADER AREA -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 px-2">
+        <div>
+            <h2 class="text-3xl font-black text-slate-800 uppercase tracking-tighter italic font-gagah">Strategic Vault</h2>
+            <p class="text-sky-500 text-[10px] font-black uppercase tracking-[0.3em] mt-1">Unified Link & Credential Command</p>
+        </div>
+        
+        <div class="flex items-center space-x-3">
+            <!-- SEARCH BAR -->
+            <form action="/alat/vault" method="GET" class="relative group">
+                <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 text-xs group-focus-within:text-sky-500 transition-colors"></i>
+                <input type="text" name="q" value="{{ query }}" placeholder="Search resources..." 
+                       class="bg-white border border-sky-100 py-3 pl-10 pr-4 rounded-2xl text-xs font-bold text-slate-700 focus:ring-4 focus:ring-sky-500/10 outline-none transition-all w-64 shadow-sm">
+            </form>
+            
+            <button @click="vaultModal = true" class="bg-sky-600 hover:bg-sky-700 text-white px-8 py-3 rounded-2xl font-black shadow-xl shadow-sky-900/10 transition-all transform active:scale-95 flex items-center space-x-3 text-[10px]">
+                <i class="fas fa-plus-circle text-sm"></i>
+                <span class="tracking-widest uppercase">New Resource</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- MAIN VAULT TABLE -->
+    <div class="professional-box">
+        <table class="w-full text-left border-collapse">
+            <thead class="bg-slate-50 border-b border-slate-100">
+                <tr>
+                    <th class="p-5 text-[10px] font-black text-slate-400 uppercase tracking-widest w-1/4">Resource & Category</th>
+                    <th class="p-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Authorized Credentials</th>
+                    <th class="p-5 text-center text-[10px] font-black text-slate-400 uppercase tracking-widest w-40">Operations</th>
+                </tr>
+            </thead>
+        </table>
+        <div class="scroll-area">
+            <table class="w-full text-left">
+                <tbody class="divide-y divide-slate-50">
+                    {% for item in vault %}
+                    <tr class="hover:bg-sky-50/30 transition-colors">
+                        <!-- Resource Info -->
+                        <td class="p-6 align-top">
+                            <div class="flex flex-col space-y-2">
+                                <span class="text-[9px] font-black bg-sky-100 text-sky-600 px-3 py-1 rounded-full w-fit uppercase tracking-tighter">{{ item.master.kategori }}</span>
+                                <p class="text-lg font-black text-slate-800 tracking-tight leading-tight">{{ item.master.nama_resource }}</p>
+                                {% if item.master.url and item.master.url != '-' %}
+                                <a href="{{ item.master.url }}" target="_blank" class="text-sky-500 text-[10px] font-bold hover:underline flex items-center space-x-1">
+                                    <i class="fas fa-external-link-alt text-[8px]"></i>
+                                    <span>Visit Access Point</span>
+                                </a>
+                                {% endif %}
+                            </div>
+                        </td>
+                        
+                        <!-- Credentials List -->
+                        <td class="p-6">
+                            <div class="space-y-4">
+                                {% for key in item.key_list %}
+                                <div class="bg-slate-50/50 p-4 rounded-2xl border border-slate-100 group relative">
+                                    <div class="flex items-center justify-between">
+                                        <div class="grid grid-cols-2 gap-8 flex-1">
+                                            <div class="flex flex-col">
+                                                <span class="text-[8px] font-black text-slate-300 uppercase">Identity</span>
+                                                <span class="text-xs font-bold text-slate-700">{{ key.username }}</span>
+                                            </div>
+                                            <div class="flex flex-col">
+                                                <span class="text-[8px] font-black text-slate-300 uppercase">Secret</span>
+                                                <div class="flex items-center space-x-2" x-data="{ show: false }">
+                                                    <span class="text-xs font-mono font-black tracking-widest text-slate-700" x-text="show ? '{{ key.password }}' : '••••••••'"></span>
+                                                    <button @click="show = !show" class="text-slate-300 hover:text-sky-500 transition"><i class="fas" :class="show ? 'fa-eye-slash' : 'fa-eye'"></i></button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="flex items-center space-x-2 ml-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <button @click="keyData = {id: '{{ key.id }}', m_id: '{{ item.master.id }}', user: '{{ key.username }}', pass: '{{ key.password }}', note: '{{ key.catatan }}'}; keyModal = true" class="p-2 text-sky-600 hover:bg-sky-100 rounded-lg transition"><i class="fas fa-edit text-[10px]"></i></button>
+                                            <a href="/alat/vault/key/delete/{{ key.id }}" onclick="return confirm('Revoke this key?')" class="p-2 text-red-400 hover:bg-red-50 rounded-lg transition"><i class="fas fa-trash-alt text-[10px]"></i></a>
+                                        </div>
+                                    </div>
+                                    {% if key.catatan and key.catatan != '-' %}
+                                    <div class="mt-2 pt-2 border-t border-slate-100/50">
+                                        <p class="text-[10px] font-medium text-slate-400 italic">"{{ key.catatan }}"</p>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                {% endfor %}
+                                
+                                <button @click="keyData = {id: '', m_id: '{{ item.master.id }}', user: '', pass: '', note: ''}; keyModal = true" class="w-full py-2 border-2 border-dashed border-sky-100 rounded-2xl text-[9px] font-black text-sky-300 uppercase hover:border-sky-300 hover:text-sky-500 transition-all">
+                                    <i class="fas fa-key mr-2"></i> Authorized New Key
+                                </button>
+                            </div>
+                        </td>
+                        
+                        <!-- Actions -->
+                        <td class="p-6 text-center">
+                            <div class="flex items-center justify-center space-x-2">
+                                <button @click="resData = {id: '{{ item.master.id }}', kategori: '{{ item.master.kategori }}', nama: '{{ item.master.nama_resource }}', url: '{{ item.master.url }}'}; editModal = true" class="bg-white border border-sky-100 text-sky-600 p-3 rounded-xl shadow-sm hover:shadow-lg transition transform active:scale-90">
+                                    <i class="fas fa-cog"></i>
+                                </button>
+                                <a href="/alat/vault/delete/{{ item.master.id }}" onclick="return confirm('Destroy entire resource and all its keys?')" class="bg-white border border-red-50 text-red-500 p-3 rounded-xl shadow-sm hover:bg-red-500 hover:text-white transition transform active:scale-90">
+                                    <i class="fas fa-dumpster-fire"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- MODAL: NEW RESOURCE -->
+    <div x-show="vaultModal" x-cloak class="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-slate-950/80 backdrop-blur-md">
+        <div class="bg-white w-full max-w-xl rounded-[3rem] p-10 shadow-2xl relative">
+            <button @click="vaultModal = false" class="absolute right-10 top-10 text-slate-300 text-3xl font-light">&times;</button>
+            <h3 class="text-3xl font-black text-slate-900 uppercase tracking-tighter mb-8 italic">New Access Point</h3>
+            <form action="/alat/vault/save" method="POST" class="space-y-6">
+                <div class="grid grid-cols-2 gap-4">
+                    <div><label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-4">Category</label><input type="text" name="kategori" required class="w-full bg-slate-50 border-0 rounded-2xl p-4 font-bold text-slate-700 focus:ring-2 focus:ring-sky-500" placeholder="e.g. Finance"></div>
+                    <div><label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-4">Resource Name</label><input type="text" name="nama_resource" required class="w-full bg-slate-50 border-0 rounded-2xl p-4 font-bold text-slate-700 focus:ring-2 focus:ring-sky-500" placeholder="e.g. Portal Diskominfo"></div>
+                </div>
+                <div><label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-4">Access URL</label><input type="text" name="url" class="w-full bg-slate-50 border-0 rounded-2xl p-4 font-bold text-slate-700 focus:ring-2 focus:ring-sky-500" placeholder="https://..."></div>
+                
+                <div class="pt-6 border-t border-slate-100">
+                    <p class="text-[10px] font-black text-sky-500 uppercase mb-4 tracking-widest">Initial Credential</p>
+                    <div class="grid grid-cols-2 gap-4">
+                        <input type="text" name="username" placeholder="Username" class="bg-slate-50 border-0 rounded-xl p-3 text-xs font-bold">
+                        <input type="text" name="password" placeholder="Passcode" class="bg-slate-50 border-0 rounded-xl p-3 text-xs font-bold">
+                    </div>
+                </div>
+                
+                <button type="submit" class="w-full bg-sky-600 text-white py-6 rounded-[2rem] font-black text-xl shadow-2xl transition transform active:scale-95 mt-4 uppercase tracking-widest">Seal & Deploy</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: EDIT RESOURCE -->
+    <div x-show="editModal" x-cloak class="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-slate-950/80 backdrop-blur-md">
+        <div class="bg-white w-full max-w-xl rounded-[3rem] p-10 shadow-2xl relative">
+            <button @click="editModal = false" class="absolute right-10 top-10 text-slate-300 text-3xl font-light">&times;</button>
+            <h3 class="text-3xl font-black text-slate-900 uppercase tracking-tighter mb-8 italic">Configure Resource</h3>
+            <form :action="'/alat/vault/update/' + resData.id" method="POST" class="space-y-6">
+                <div class="grid grid-cols-2 gap-4">
+                    <div><label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-4">Category</label><input type="text" name="kategori" x-model="resData.kategori" required class="w-full bg-slate-50 border-0 rounded-2xl p-4 font-bold text-slate-700 focus:ring-2 focus:ring-sky-500"></div>
+                    <div><label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-4">Resource Name</label><input type="text" name="nama_resource" x-model="resData.nama" required class="w-full bg-slate-50 border-0 rounded-2xl p-4 font-bold text-slate-700 focus:ring-2 focus:ring-sky-500"></div>
+                </div>
+                <div><label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-4">Access URL</label><input type="text" name="url" x-model="resData.url" class="w-full bg-slate-50 border-0 rounded-2xl p-4 font-bold text-slate-700 focus:ring-2 focus:ring-sky-500"></div>
+                <button type="submit" class="w-full bg-indigo-600 text-white py-6 rounded-[2rem] font-black text-xl shadow-2xl transition transform active:scale-95 mt-4 uppercase tracking-widest">Update Manifest</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: ADD/EDIT KEY -->
+    <div x-show="keyModal" x-cloak class="fixed inset-0 z-[110] flex items-center justify-center p-6 bg-slate-950/90 backdrop-blur-md">
+        <div class="bg-white w-full max-w-lg rounded-[3rem] p-10 shadow-2xl relative">
+            <button @click="keyModal = false" class="absolute right-10 top-10 text-slate-300 text-3xl font-light">&times;</button>
+            <h3 class="text-3xl font-black text-slate-900 uppercase tracking-tighter mb-8 italic" x-text="keyData.id ? 'Modify Key' : 'Authorized New Key'"></h3>
+            <form :action="keyData.id ? '/alat/vault/key/update/' + keyData.id : '/alat/vault/key/add/' + keyData.m_id" method="POST" class="space-y-6">
+                <div class="space-y-4">
+                    <div><label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-4">Identity</label><input type="text" name="username" x-model="keyData.user" required class="w-full bg-slate-50 border-0 rounded-2xl p-4 font-bold text-slate-700 focus:ring-2 focus:ring-sky-500"></div>
+                    <div><label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-4">Access Passcode</label><input type="text" name="password" x-model="keyData.pass" required class="w-full bg-slate-50 border-0 rounded-2xl p-4 font-bold text-slate-700 focus:ring-2 focus:ring-sky-500"></div>
+                    <div><label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-4">Strategic Notes</label><textarea name="catatan" x-model="keyData.note" rows="3" class="w-full bg-slate-50 border-0 rounded-2xl p-4 font-medium text-slate-700 focus:ring-2 focus:ring-sky-500"></textarea></div>
+                </div>
+                <button type="submit" class="w-full bg-sky-600 text-white py-6 rounded-[2rem] font-black text-xl shadow-2xl transition transform active:scale-95 mt-4 uppercase tracking-widest">Commit Key</button>
+            </form>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

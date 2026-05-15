@@ -1,0 +1,121 @@
+﻿{% extends 'base.html' %}
+
+{% block content %}
+<div class="space-y-6" x-data="{
+    noteModal: false,
+    editMode: false,
+    detailModal: false,
+    editData: {id:'', judul:'', isi:'', link:''},
+    selectedNote: {judul:'', isi:'', link:'', tgl:''}
+}">
+    <!-- HEADER AREA -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 px-2">
+        <div>
+            <h2 class="text-3xl font-black text-slate-800 uppercase tracking-tighter italic font-gagah">Strategic Notes</h2>
+            <p class="text-sky-500 text-[10px] font-black uppercase tracking-[0.3em] mt-1">Intelligence & Quick Memo Vault</p>
+        </div>
+
+        <div class="flex items-center space-x-3">
+            <form action="/alat/notes" method="GET" class="relative group">
+                <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 text-xs group-focus-within:text-sky-500 transition-colors"></i>
+                <input type="text" name="q" value="{{ query }}" placeholder="Search notes..."
+                       class="bg-white border border-sky-100 py-3 pl-10 pr-4 rounded-2xl text-xs font-bold text-slate-700 focus:ring-4 focus:ring-sky-500/10 outline-none transition-all w-64 shadow-sm">     
+            </form>
+
+            <button @click="editMode = false; editData = {id:'', judul:'', isi:'', link:''}; noteModal = true" class="bg-sky-600 hover:bg-sky-700 text-white px-8 py-3 rounded-2xl font-black shadow-xl shadow-sky-900/10 transition-all transform active:scale-95 flex items-center space-x-3 text-[10px]">
+                <i class="fas fa-sticky-note text-sm"></i>
+                <span class="tracking-widest uppercase">Create Note</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- NOTES GRID: COMPACT CARDS -->
+    <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+        {% for n in notes %}
+        <div class="glass-card p-4 rounded-2xl shadow-md hover:shadow-xl transition-all border-sky-50 relative group cursor-pointer"
+             data-judul="{{ n.judul }}" 
+             data-isi="{{ n.isi_note }}" 
+             data-link="{{ n.link_terkait }}" 
+             data-tgl="{{ n.created_at }}"
+             @click="selectedNote = {judul: $el.getAttribute('data-judul'), isi: $el.getAttribute('data-isi'), link: $el.getAttribute('data-link'), tgl: $el.getAttribute('data-tgl')}; detailModal = true">
+            <div class="flex flex-col h-full justify-between">
+                <div class="mb-2">
+                    <h3 class="text-[11px] font-black text-slate-800 tracking-tight leading-tight uppercase truncate">{{ n.judul }}</h3>
+                    <p class="text-[9px] text-slate-400 font-bold mt-1">{{ n.created_at.split(' ')[0] }}</p>
+                </div>
+
+                <div class="flex items-center justify-end space-x-2 pt-2 border-t border-slate-50 mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button @click.stop="let parent = $el.closest('.glass-card'); editData = {id: '{{ n.id }}', judul: parent.getAttribute('data-judul'), isi: parent.getAttribute('data-isi'), link: parent.getAttribute('data-link')}; editMode = true; noteModal = true;" class="text-blue-500 hover:text-blue-700 transition">
+                        <i class="fas fa-edit text-[10px]"></i>
+                    </button>
+                    <a @click.stop href="/alat/notes/copy/{{ n.id }}" class="text-sky-500 hover:text-sky-700 transition" title="Duplicate Card">
+                        <i class="fas fa-clone text-[10px]"></i>
+                    </a>
+                    <a @click.stop href="/alat/notes/delete/{{ n.id }}" onclick="return confirm('Destroy this intelligence note?')" class="text-red-400 hover:text-red-600 transition">
+                        <i class="fas fa-trash text-[10px]"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="col-span-full py-20 text-center glass-card rounded-[3rem]">
+            <p class="text-slate-400 font-black uppercase tracking-[0.4em] text-xs">No strategic notes recorded, Jenderal.</p>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- MODAL: DETAIL NOTE (FULL INFO) -->
+    <div x-show="detailModal" x-cloak class="fixed inset-0 z-[120] flex items-center justify-center p-6 bg-slate-950/90 backdrop-blur-xl">
+        <div class="bg-white w-full max-w-3xl rounded-[3rem] shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+            <div class="p-8 bg-slate-900 text-white flex justify-between items-center">
+                <div>
+                    <h3 class="text-2xl font-black uppercase tracking-tighter italic" x-text="selectedNote.judul"></h3>
+                    <p class="text-blue-400 text-[10px] font-black uppercase tracking-widest mt-1" x-text="selectedNote.tgl"></p>
+                </div>
+                <button @click="detailModal = false" class="text-3xl font-light hover:text-red-400 transition">&times;</button>
+            </div>
+            <div class="p-10 overflow-y-auto custom-scrollbar">
+                <div class="prose prose-slate max-w-none">
+                    <p class="text-slate-700 text-lg leading-relaxed whitespace-pre-line font-medium" x-text="selectedNote.isi"></p>
+                </div>
+
+                <template x-if="selectedNote.link && selectedNote.link !== '-'">
+                    <div class="mt-8 pt-8 border-t border-slate-100">
+                        <a :href="selectedNote.link" target="_blank" class="inline-flex items-center bg-blue-600 text-white px-8 py-4 rounded-2xl font-black uppercase text-xs tracking-widest shadow-xl shadow-blue-900/20 hover:bg-blue-700 transition">
+                            <i class="fas fa-external-link-alt mr-3"></i> Open Source Reference        
+                        </a>
+                    </div>
+                </template>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: INPUT/EDIT NOTE -->
+    <div x-show="noteModal" x-cloak class="fixed inset-0 z-[130] flex items-center justify-center p-6 bg-slate-950/95 backdrop-blur-2xl">
+        <div class="bg-white w-full max-w-2xl rounded-[3rem] p-12 shadow-2xl relative">
+            <button @click="noteModal = false" class="absolute right-10 top-10 text-slate-300 text-3xl font-light hover:text-red-500 transition">&times;</button>
+            <h3 class="text-3xl font-black text-slate-900 uppercase tracking-tighter mb-8 italic" x-text="editMode ? 'Recalibrate Note' : 'New Strategic Note'"></h3>
+
+            <form :action="editMode ? '/alat/notes/update/' + editData.id : '/alat/notes/save'" method="POST" class="space-y-6">
+                <div>
+                    <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-4">Note Title</label>
+                    <input type="text" name="judul" x-model="editData.judul" required class="w-full bg-slate-50 border-0 rounded-2xl p-4 font-bold text-slate-700 focus:ring-2 focus:ring-sky-500 shadow-sm"> 
+                </div>
+                <div>
+                    <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-4">Content / Intelligence</label>
+                    <textarea name="isi_note" x-model="editData.isi" rows="5" required class="w-full bg-slate-50 border-0 rounded-3xl p-6 font-medium text-slate-700 focus:ring-2 focus:ring-sky-500 shadow-sm"></textarea>
+                </div>
+                <div>
+                    <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-4">Reference Link</label>
+                    <input type="text" name="link_terkait" x-model="editData.link" class="w-full bg-slate-50 border-0 rounded-2xl p-4 font-bold text-slate-700 focus:ring-2 focus:ring-sky-500 shadow-sm">
+                </div>
+
+                <button type="submit" class="w-full bg-sky-600 text-white py-6 rounded-[2rem] font-black text-xl shadow-2xl transition transform active:scale-95 mt-4 uppercase tracking-widest">
+                    <span x-text="editMode ? 'Execute Update' : 'Commit Note'"></span>
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

@@ -1,0 +1,7 @@
+﻿@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
+:root { --bg-black: #050608; --card-glass: rgba(20, 24, 28, 0.7); --gold-main: #d4af37; }
+body { background: var(--bg-black); color: #fff; font-family: 'Inter', sans-serif; }
+.sidebar { width: 300px; height: 100vh; position: fixed; background: #000; border-right: 1px solid #222; }
+.card { background: var(--card-glass); border: 1px solid rgba(255,255,255,0.05); padding: 25px; border-radius: 15px; margin-bottom: 20px; transition: 0.3s; }
+.card:hover { border-color: var(--gold-main); transform: translateY(-5px); }
+.gold-text { color: var(--gold-main); font-weight: 900; }

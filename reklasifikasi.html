@@ -1,0 +1,340 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="space-y-6" x-data="{ 
+    reklasModal: false, detailModal: false, detailData: {},
+    editMode: false,
+    editId: null,
+    qty: 0,
+    n_satuan: 0,
+    b_umum: 0,
+    get nilai_kesatuan() { return this.qty * this.n_satuan },
+    get jumlah_total() { return this.nilai_kesatuan + parseFloat(this.b_umum || 0) },
+    openEdit(id) {
+        this.editMode = true;
+        this.editId = id;
+        fetch('/bmd/reklasifikasi/detail/' + id)
+            .then(res => res.json())
+            .then(d => {
+                document.getElementsByName('no_dokumen')[0].value = d.no_dokumen;
+                document.getElementsByName('tgl_dokumen')[0].value = d.tgl_dokumen;
+                document.getElementsByName('uraian_belanja')[0].value = d.uraian_belanja;
+                document.getElementsByName('nilai_belanja')[0].value = d.nilai_belanja;
+                document.getElementById('k_belanja').value = d.kode_belanja;
+                document.getElementById('k_belanja_ket').value = d.ket_belanja;
+                document.getElementById('k_aset').value = d.kode_aset;
+                document.getElementById('k_aset_ket').value = d.ket_aset;
+                document.getElementsByName('nama_barang')[0].value = d.nama_barang;
+                document.getElementsByName('jenis_belanja')[0].value = d.jenis_belanja;
+                document.getElementsByName('volume')[0].value = d.volume;
+                document.getElementsByName('keterangan')[0].value = d.keterangan;
+                document.getElementsByName('link_foto')[0].value = d.link_foto;
+
+                this.qty = d.qty || 0;
+                this.n_satuan = d.nilai_satuan || 0;
+                this.b_umum = d.biaya_umum || 0;
+                this.reklasModal = true;
+
+                // Update text displays
+                document.getElementById('display_ket_b').innerText = d.ket_belanja || '-';
+                document.getElementById('display_kode_a').innerText = d.kode_aset || '-';
+                document.getElementById('display_ket_a').innerText = d.ket_aset || '-';
+            });
+    },
+
+    openDetail(id) {
+        fetch('/bmd/reklasifikasi/detail/' + id)
+            .then(res => res.json())
+            .then(d => {
+                this.detailData = d;
+                this.detailModal = true;
+            });
+    }
+}">
+    <!-- HEADER AREA -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 px-2">
+        <div>
+            <h2 class="text-3xl font-black text-slate-800 uppercase tracking-tighter italic font-gagah">Reklasifikasi Asset</h2>
+            <p class="text-sky-500 text-[10px] font-black uppercase tracking-[0.3em] mt-1">BMD Strategic Reclassification Hub</p>
+        </div>
+
+        <div class="flex items-center space-x-3">
+            <a href="/bmd/reklasifikasi/export" class="bg-emerald-50 text-emerald-600 border border-emerald-100 px-6 py-3 rounded-2xl font-black text-[9px] uppercase tracking-widest hover:bg-emerald-600 hover:text-white transition shadow-sm flex items-center">
+                <i class="fas fa-file-csv mr-2 text-xs"></i> EXPORT CSV
+            </a>
+            <form action="/bmd/reklasifikasi" method="GET" class="relative group">
+                <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 text-xs group-focus-within:text-sky-500 transition-colors"></i>
+                <input type="text" name="q" value="{{ query }}" placeholder="Search documents..."      
+                       class="bg-white border border-sky-100 py-3 pl-10 pr-4 rounded-2xl text-xs font-bold text-slate-700 focus:ring-4 focus:ring-sky-500/10 outline-none transition-all w-64 shadow-sm">     
+            </form>
+
+            <button @click="editMode = false; reklasModal = true; document.getElementById('reklas-form').reset(); qty=1; n_satuan=0; b_umum=0; document.getElementById('display_ket_b').innerText='-'; document.getElementById('display_kode_a').innerText='-'; document.getElementById('display_ket_a').innerText='-';"
+                    class="bg-sky-600 hover:bg-sky-700 text-white px-8 py-3 rounded-2xl font-black shadow-xl shadow-sky-900/10 transition-all transform active:scale-95 flex items-center space-x-3 text-[10px]">
+                <i class="fas fa-exchange-alt text-sm"></i>
+                <span class="tracking-widest uppercase">Input Reklas</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- MAIN TABLE -->
+    <div class="professional-box">
+        <div class="table-responsive scroll-area">
+            <table class="w-full text-left">
+                <thead class="bg-slate-50 border-b border-slate-100 sticky top-0 z-20">
+                    <tr>
+                        <th class="p-5 text-[9px] font-black text-slate-400 uppercase tracking-widest">Dokumen & Tanggal</th>
+                        <th class="p-5 text-[9px] font-black text-slate-400 uppercase tracking-widest">Detail Belanja & Asset</th>
+                        <th class="p-5 text-[9px] font-black text-slate-400 uppercase tracking-widest text-right">Rincian Nilai (Rp)</th>
+                        <th class="p-5 text-center text-[9px] font-black text-slate-400 uppercase tracking-widest">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-50">
+                    {% for r in results %}
+                    <tr class="hover:bg-sky-50/30 transition-colors text-xs">
+                        <td class="p-6 align-top">
+                            <p class="font-black text-slate-800">{{ r.no_dokumen }}</p>
+                            <p class="text-[10px] font-bold text-slate-400 mt-1 uppercase">{{ r.tgl_dok }}</p>
+                            <span class="inline-block mt-2 text-[8px] font-black bg-slate-100 text-slate-500 px-2 py-0.5 rounded">{{ r.jenis_belanja }}</span>
+                        </td>
+                        <td class="p-6 align-top">
+                            <div class="space-y-2">
+                                <p @click="openDetail({{ r.id }})" class="font-black text-sky-600 uppercase tracking-tight cursor-pointer hover:text-blue-800 hover:underline decoration-2 underline-offset-4 transition-all">{{ r.nama_barang }}</p>
+                                <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">       
+                                    <p class="text-[10px] text-slate-500 leading-relaxed"><span class="font-black">Belanja:</span> {{ r.uraian_belanja }}</p>
+                                    <p class="text-[10px] text-slate-400 mt-1"><span class="font-black">Aset:</span> {{ r.kode_aset }} - {{ r.ket_aset }}</p>
+                                    {% if r.link_foto and r.link_foto != '-' %}
+                                    <div class="mt-3">
+                                        <a href="{{ r.link_foto }}" target="_blank" class="inline-flex items-center px-3 py-1.5 bg-amber-50 text-amber-600 rounded-lg text-[9px] font-black uppercase tracking-tighter hover:bg-amber-600 hover:text-white transition border border-amber-100">
+                                            <i class="fas fa-link mr-1.5"></i> Lihat Dokumen Referensi
+                                        </a>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </td>
+                        <td class="p-6 align-top text-right">
+                            <div class="space-y-1">
+                                <p class="text-[10px] font-bold text-slate-400">Qty: {{ r.qty }} {{ r.volume }}</p>
+                                <p class="text-xs font-black text-slate-700">Sat: {{ "{:,.0f}".format(r.nilai_satuan).replace(',', '.') }}</p>
+                                <p class="text-xs font-black text-emerald-600">Total: {{ "{:,.0f}".format(r.jumlah_total).replace(',', '.') }}</p>
+                            </div>
+                        </td>
+                        <td class="p-6 text-center align-top">
+                            <div class="flex items-center justify-center space-x-2">
+                                <button @click="openEdit({{ r.id }})" class="p-2.5 bg-sky-50 text-sky-600 rounded-xl hover:bg-sky-600 hover:text-white transition shadow-sm"><i class="fas fa-edit text-[10px]"></i></button>
+                                <a href="/bmd/reklasifikasi/delete/{{ r.id }}" onclick="return confirm('Hapus data reklas ini?')" class="p-2.5 bg-red-50 text-red-500 rounded-xl hover:bg-red-600 hover:text-white transition shadow-sm"><i class="fas fa-trash-alt text-[10px]"></i></a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- MODAL INPUT/EDIT -->
+    <div x-show="reklasModal" x-cloak class="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-slate-950/80 backdrop-blur-md">
+        <div class="bg-white w-full max-w-4xl rounded-[3rem] p-10 shadow-2xl relative max-h-[90vh] overflow-y-auto custom-scrollbar">
+            <button @click="reklasModal = false" class="absolute right-10 top-10 text-slate-300 text-3xl font-light hover:text-red-500 transition">&times;</button>
+            <h3 class="text-3xl font-black text-slate-900 uppercase tracking-tighter mb-8 italic" x-text="editMode ? 'Update Reklasifikasi' : 'New Reklasifikasi Entry'"></h3>
+
+            <form id="reklas-form" :action="editMode ? '/bmd/reklasifikasi/update/' + editId : '/bmd/reklasifikasi/save'" method="POST" class="space-y-8">
+                <input type="hidden" name="kode_belanja" id="k_belanja">
+                <input type="hidden" name="ket_belanja" id="k_belanja_ket">
+                <input type="hidden" name="kode_aset" id="k_aset">
+                <input type="hidden" name="ket_aset" id="k_aset_ket">
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 bg-slate-50/50 p-6 rounded-3xl border border-slate-100">
+                    <div class="md:col-span-2">
+                        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-4">No Dokumen / SPM</label>
+                        <input type="text" name="no_dokumen" required class="w-full bg-white border border-sky-100 rounded-2xl p-4 font-bold text-slate-700 focus:ring-2 focus:ring-sky-500 outline-none shadow-sm">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-4">Tanggal Dokumen</label>
+                        <input type="date" name="tgl_dokumen" required class="w-full bg-white border border-sky-100 rounded-2xl p-4 font-bold text-slate-700 focus:ring-2 focus:ring-sky-500 outline-none shadow-sm">
+                    </div>
+                </div>
+
+                <div class="space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="select2-container-wrapper">
+                            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-4">Pilih Referensi Kode Belanja</label>
+                            <select id="ref_select" class="js-reklas-select w-full" onchange="fillReklasRef(this)">
+                                <option value="">-- Cari Kode Belanja --</option>
+                                {% for ref in referensi %}
+                                <option value="{{ ref.id }}"
+                                        data-kb="{{ ref.kode_belanja }}"
+                                        data-nb="{{ ref.uraian_belanja }}"
+                                        data-ka="{{ ref.rek_aset }}"
+                                        data-ua="{{ ref.nama_asset }}">
+                                    {{ ref.kode_belanja }} - {{ ref.uraian_belanja[:60] }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-4">Uraian Belanja (Manual)</label>
+                            <input type="text" name="uraian_belanja" required class="w-full bg-white border border-sky-100 rounded-2xl p-4 font-bold text-slate-700 focus:ring-2 focus:ring-sky-500 shadow-sm" placeholder="Uraian pada dokumen...">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-4">Link Referensi Dokumen (URL)</label>
+                            <input type="text" name="link_foto" class="w-full bg-white border border-amber-100 rounded-2xl p-4 font-bold text-amber-700 focus:ring-2 focus:ring-amber-500 shadow-sm" placeholder="https://drive.google.com/...">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-4">Keterangan Tambahan</label>
+                            <input type="text" name="keterangan" class="w-full bg-white border border-sky-100 rounded-2xl p-4 font-bold text-slate-700 focus:ring-2 focus:ring-sky-500 shadow-sm" placeholder="Catatan khusus...">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 bg-sky-50/30 p-6 rounded-3xl border border-sky-100">
+                        <div>
+                            <label class="block text-[9px] font-black text-sky-400 uppercase mb-2">Keterangan Belanja (Auto)</label>
+                            <p class="text-xs font-bold text-slate-600" id="display_ket_b">-</p>
+                        </div>
+                        <div>
+                            <label class="block text-[9px] font-black text-sky-400 uppercase mb-2">Kode Asset (Auto)</label>
+                            <p class="text-xs font-bold text-slate-600" id="display_kode_a">-</p>      
+                        </div>
+                        <div>
+                            <label class="block text-[9px] font-black text-sky-400 uppercase mb-2">Nama Asset (Auto)</label>
+                            <p class="text-xs font-bold text-slate-600" id="display_ket_a">-</p>       
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                    <div class="md:col-span-2">
+                        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-4">Nama Barang (Hasil Reklas)</label>
+                        <input type="text" name="nama_barang" required class="w-full bg-white border border-sky-100 rounded-2xl p-4 font-bold text-slate-700 focus:ring-2 focus:ring-sky-500 shadow-sm" placeholder="Nama barang...">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-4">Jenis Belanja</label>
+                        <select name="jenis_belanja" class="w-full bg-white border border-sky-100 rounded-2xl p-4 font-bold text-slate-700 shadow-sm">
+                            <option value="GU">GU</option><option value="TU">TU</option><option value="LS">LS</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-4">Satuan Volume</label>
+                        <select name="volume" class="w-full bg-white border border-sky-100 rounded-2xl p-4 font-bold text-slate-700 shadow-sm">
+                            <option value="Unit">Unit</option><option value="m2">m2</option><option value="m3">m3</option><option value="Pcs">Pcs</option><option value="Paket">Paket</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6 bg-slate-900 p-8 rounded-[2.5rem] shadow-2xl">
+                    <div>
+                        <label class="block text-[9px] font-black text-slate-500 uppercase mb-2 tracking-widest">Nilai Belanja (SPM)</label>
+                        <input type="number" step="any" name="nilai_belanja" class="bg-slate-800 border-0 rounded-xl p-3 w-full text-white font-black text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-[9px] font-black text-slate-500 uppercase mb-2 tracking-widest">Qty</label>
+                        <input type="number" name="qty" x-model.number="qty" class="bg-slate-800 border-0 rounded-xl p-3 w-full text-white font-black text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-[9px] font-black text-sky-400 uppercase mb-2 tracking-widest">Nilai Satuan (Rp)</label>
+                        <input type="number" step="any" name="nilai_satuan" x-model.number="n_satuan" class="bg-slate-800 border border-sky-900 rounded-xl p-3 w-full text-sky-400 font-black text-sm">       
+                    </div>
+                    <div>
+                        <label class="block text-[9px] font-black text-amber-400 uppercase mb-2 tracking-widest">Biaya Umum (Rp)</label>
+                        <input type="number" step="any" name="biaya_umum" x-model.number="b_umum" class="bg-slate-800 border border-amber-900 rounded-xl p-3 w-full text-amber-400 font-black text-sm">       
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-between p-6 bg-sky-50 rounded-3xl border-2 border-dashed border-sky-200">
+                    <div>
+                        <p class="text-[10px] font-black text-sky-400 uppercase">Grand Total (Asset Value)</p>
+                        <p class="text-3xl font-black text-sky-600 font-gagah" x-text="'Rp ' + (jumlah_total || 0).toLocaleString('id-ID')"></p>
+                    </div>
+                    <button type="submit" class="bg-sky-600 text-white px-12 py-5 rounded-[1.5rem] font-black text-lg shadow-xl shadow-sky-900/20 hover:bg-sky-700 transition transform active:scale-95 uppercase tracking-widest">Commit Reklas</button>
+                </div>
+            </form>
+        </div>
+    </div>
+<!-- DETAIL MODAL GAGAH -->
+    <div x-show="detailModal" x-cloak class="fixed inset-0 z-[110] flex items-center justify-center p-4 md:p-8 bg-slate-950/90 backdrop-blur-xl">
+        <div @click.away="detailModal = false" class="bg-white w-full max-w-5xl rounded-[3rem] overflow-hidden shadow-2xl relative border border-white/20">
+            <div class="absolute top-0 left-0 w-full h-32 bg-gradient-to-r from-slate-900 to-sky-900 opacity-10 pointer-events-none"></div>
+            <button @click="detailModal = false" class="absolute right-8 top-8 z-50 text-slate-400 hover:text-red-500 transition-colors bg-slate-100 p-2 rounded-full shadow-inner">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+            <div class="relative p-10 md:p-14">
+                <div class="mb-10">
+                    <h2 class="text-4xl font-black text-slate-800 uppercase tracking-tighter italic font-gagah leading-none" x-text="detailData.nama_barang"></h2>
+                    <div class="flex items-center space-x-3 mt-4">
+                        <span class="px-3 py-1 bg-sky-100 text-sky-700 rounded-lg text-[10px] font-black uppercase tracking-widest" x-text="detailData.no_dokumen"></span>
+                        <span class="text-slate-300">/</span>
+                        <span class="text-slate-500 text-[10px] font-bold uppercase tracking-widest" x-text="detailData.tgl_dokumen"></span>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+                    <div class="space-y-8">
+                        <div class="p-6 bg-slate-50 rounded-[2rem] border border-slate-100">
+                            <label class="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] mb-3 block">Informasi Belanja Awal</label>
+                            <div class="space-y-4">
+                                <div><p class="text-[10px] font-black text-slate-400 uppercase">Uraian Dokumen</p><p class="text-sm font-bold text-slate-700" x-text="detailData.uraian_belanja"></p></div>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div><p class="text-[10px] font-black text-slate-400 uppercase">Kode Belanja</p><p class="text-xs font-black text-sky-600" x-text="detailData.kode_belanja"></p></div>
+                                    <div><p class="text-[10px] font-black text-slate-400 uppercase">Nilai Belanja</p><p class="text-xs font-black text-slate-700" x-text="'Rp ' + (detailData.nilai_belanja || 0).toLocaleString('id-ID')"></p></div>
+                                </div>
+                            </div>
+</div>
+
+<script>
+function fillReklasRef(sel) {
+    const opt = sel.options[sel.selectedIndex];
+    if(!opt.value) return;
+    document.getElementById('k_belanja').value = opt.getAttribute('data-kb');
+    document.getElementById('k_belanja_ket').value = opt.getAttribute('data-nb');
+    document.getElementById('k_aset').value = opt.getAttribute('data-ka');
+    document.getElementById('k_aset_ket').value = opt.getAttribute('data-ua');
+
+    // Update visual labels
+    document.getElementById('display_ket_b').innerText = opt.getAttribute('data-nb');
+    document.getElementById('display_kode_a').innerText = opt.getAttribute('data-ka');
+    document.getElementById('display_ket_a').innerText = opt.getAttribute('data-ua');
+}
+
+$(document).ready(function() {
+    $('.js-reklas-select').select2({
+        dropdownParent: $('#ref_select').parent()
+    }).on('change', function() {
+        fillReklasRef(this);
+    });
+});
+
+    
+                        </div>
+                        <div class="p-6 bg-amber-50/50 rounded-[2rem] border border-amber-100">
+                            <label class="text-[9px] font-black text-amber-500 uppercase tracking-[0.2em] mb-2 block">Catatan Strategis</label>
+                            <p class="text-xs font-bold text-amber-900 italic" x-text="detailData.keterangan || '-'"></p>
+                        </div>
+                    </div>
+                    <div class="space-y-8">
+                        <div class="p-6 bg-sky-50/50 rounded-[2rem] border border-sky-100">
+                            <label class="text-[9px] font-black text-sky-500 uppercase tracking-[0.2em] mb-4 block">Transformasi Asset BMD</label>
+                            <div class="space-y-6">
+                                <div><p class="text-[10px] font-black text-sky-400 uppercase">Target Reklasifikasi</p><p class="text-sm font-black text-slate-800" x-text="detailData.kode_aset + ' - ' + detailData.ket_aset"></p></div>
+                                <div class="grid grid-cols-3 gap-4">
+                                    <div class="bg-white p-3 rounded-2xl border border-sky-50"><p class="text-[8px] font-black text-slate-400 uppercase">Qty</p><p class="text-xs font-black" x-text="detailData.qty + ' ' + detailData.volume"></p></div>
+                                    <div class="bg-white p-3 rounded-2xl border border-sky-50 col-span-2"><p class="text-[8px] font-black text-slate-400 uppercase">Nilai Satuan</p><p class="text-xs font-black" x-text="'Rp ' + (detailData.nilai_satuan || 0).toLocaleString('id-ID')"></p></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-12 p-8 bg-slate-900 rounded-[2.5rem] shadow-2xl flex items-center justify-between">
+                    <div><p class="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em]">Total Reclassified Value</p><p class="text-4xl font-black text-emerald-400 font-gagah" x-text="'Rp ' + (detailData.jumlah_total || 0).toLocaleString('id-ID')"></p></div>
+                    <template x-if="detailData.link_foto && detailData.link_foto !== '-' ">
+                        <a :href="detailData.link_foto" target="_blank" class="bg-amber-500 text-white px-8 py-4 rounded-2xl font-black text-[10px] uppercase shadow-xl flex items-center space-x-3"><i class="fas fa-external-link-alt"></i><span>Buka Dokumen</span></a>
+                    </template>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</script>
+{% endblock %}
+

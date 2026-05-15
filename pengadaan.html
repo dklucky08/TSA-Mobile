@@ -1,0 +1,284 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="bg-white p-10 rounded-[2.5rem] shadow-sm border border-gray-200" x-data="{ 
+    modalOpen: false,
+    editMode: false,
+    editId: null,
+    qty: 0,
+    harga: 0,
+    pajak: 0,
+    get jumlahTotal() { return this.qty * this.harga },
+    get totalPengadaan() { return this.jumlahTotal + parseFloat(this.pajak || 0) },
+    openEdit(id) {
+        this.editMode = true;
+        this.editId = id;
+        fetch('/bmd/pengadaan/detail/' + id)
+            .then(r => r.json())
+            .then(data => {
+                // Populate Form
+                document.getElementsByName('no_spm')[0].value = data.no_spm;
+                document.getElementsByName('program')[0].value = data.program;
+                document.getElementsByName('kegiatan')[0].value = data.kegiatan;
+                document.getElementsByName('kode_prog_keg')[0].value = data.kode_prog_keg;
+                document.getElementsByName('nama_aset')[0].value = data.nama_aset;
+                document.getElementsByName('merk')[0].value = data.merk;
+                document.getElementsByName('type')[0].value = data.type;
+                document.getElementsByName('ukuran_cc')[0].value = data.ukuran_cc;
+                document.getElementsByName('tgl_bast_dok')[0].value = data.tgl_bast_dok;
+                document.getElementsByName('no_bast_dok')[0].value = data.no_bast_dok;
+                document.getElementsByName('link_foto')[0].value = data.link_foto;
+                document.getElementsByName('link_video')[0].value = data.link_video;
+                document.getElementsByName('keterangan')[0].value = data.keterangan;
+                
+                // Re-sync Alpine state
+                const mainDiv = document.querySelector('[x-data]');
+                if (mainDiv.__x) {
+                    mainDiv.__x.$data.editMode = true;
+                    mainDiv.__x.$data.editId = id;
+                    mainDiv.__x.$data.qty = data.qty;
+                    mainDiv.__x.$data.harga = data.harga_satuan;
+                    mainDiv.__x.$data.pajak = data.biaya_umum_pajak;
+                    mainDiv.__x.$data.modalOpen = true;
+                }
+                
+                document.getElementById('k_rek').value = data.kode_rek_belanja;
+                document.getElementById('n_rek').value = data.nama_rek_belanja;
+                document.getElementById('k_aset').value = data.kode_belanja_x_aset;
+                document.getElementById('u_aset').value = data.uraian_belanja_aset;
+            });
+    }
+}">
+    <div class="flex flex-col md:flex-row md:items-center justify-between mb-10 gap-6">
+        <div class="flex items-center space-x-6">
+            <div class="bg-emerald-100 p-4 rounded-2xl text-3xl">📦</div>
+            <div>
+                <h2 class="text-3xl font-black text-slate-800 uppercase tracking-tighter">Daftar Pengadaan Barang</h2>
+                <p class="text-slate-500 text-sm font-medium">Pencatatan & Monitoring Aset Masuk Baru.</p> 
+            </div>
+        </div>
+        
+        <div class="flex items-center space-x-3">
+            <a href="/bmd/pengadaan/csv" class="bg-slate-100 text-slate-600 px-6 py-3 rounded-2xl font-black text-sm hover:bg-slate-200 transition flex items-center">
+                <i class="fas fa-file-csv mr-2"></i> DOWNLOAD CSV
+            </a>
+            <button @click="editMode = false; modalOpen = true; document.querySelector('form').reset();" class="bg-emerald-600 text-white px-8 py-3 rounded-2xl font-black text-sm shadow-lg hover:bg-emerald-700 transition flex items-center justify-center">
+                + INPUT PENGADAAN BARU
+            </button>
+        </div>
+    </div>
+
+    <!-- SEARCH BOX -->
+    <form action="/bmd/pengadaan" method="GET" class="mb-8">
+        <div class="relative">
+            <input type="text" name="q" value="{{ query }}" placeholder="Cari No SPM, Nama Aset, atau Merk..." class="w-full bg-slate-50 border-0 rounded-2xl p-5 pl-14 shadow-inner focus:ring-2 focus:ring-emerald-500 outline-none font-medium">
+            <div class="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 text-xl">🔍</div>
+        </div>
+    </form>
+
+    <!-- DATA TABLE -->
+    <div class="overflow-x-auto rounded-[2rem] border border-slate-100 shadow-sm">
+        <table class="min-w-full bg-white">
+            <thead>
+                <tr class="bg-slate-900 text-white text-[10px] uppercase tracking-widest text-center">
+                    <th class="py-5 px-4">No SPM</th>
+                    <th class="py-5 px-4">Detail Aset</th>
+                    <th class="py-5 px-4 text-center">Qty</th>
+                    <th class="py-5 px-4 text-right">Total Pengadaan</th>
+                    <th class="py-5 px-4">BAST / DOK</th>
+                    <th class="py-5 px-4">Aksi</th>
+                </tr>
+            </thead>
+            <tbody class="text-slate-600 text-xs">
+                {% for item in results %}
+                <tr class="border-b border-slate-50 hover:bg-emerald-50/30 transition">
+                    <td class="py-4 px-4 font-bold text-slate-800">{{ item.no_spm }}</td>
+                    <td class="py-4 px-4">
+                        <p class="font-black text-slate-800 uppercase">{{ item.nama_aset }}</p>
+                        <p class="text-slate-400">{{ item.merk }} {{ item.type }}</p>
+                        <p class="text-[9px] font-bold text-emerald-600 mt-1">{{ item.uraian_belanja_aset }}</p>
+                    </td>
+                    <td class="py-4 px-4 text-center font-black">{{ item.qty }}</td>
+                    <td class="py-4 px-4 text-right font-black text-blue-600">
+                        Rp {{ "{:,.2f}".format(item.total_pengadaan).replace(',', 'X').replace('.', ',').replace('X', '.') }}
+                    </td>
+                    <td class="py-4 px-4">
+                        <p class="font-bold">{{ item.tgl_bast_dok }}</p>
+                        <p class="text-[10px] text-slate-400">{{ item.no_bast_dok }}</p>
+                    </td>
+                    <td class="py-4 px-4 text-center">
+                        <div class="flex items-center justify-center space-x-2">
+                            <button @click="openEdit({{ item.id }})" class="text-blue-400 hover:text-blue-600 transition text-lg">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <a href="/bmd/pengadaan/delete/{{ item.id }}" onclick="return confirm('Hapus data pengadaan ini?')" class="text-red-300 hover:text-red-600 transition text-lg">
+                                <i class="fas fa-trash-alt"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="6" class="py-20 text-center">
+                        <p class="text-slate-400 font-bold uppercase tracking-widest text-xs">Belum ada data pengadaan, Jendral.</p>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- INPUT MODAL -->
+    <div x-show="modalOpen" x-cloak class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/90 backdrop-blur-md">
+        <div class="bg-white w-full max-w-5xl rounded-[3rem] shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+            <div class="p-8 bg-slate-900 text-white flex justify-between items-center">
+                <h3 class="text-2xl font-black uppercase tracking-tighter italic" x-text="editMode ? 'Edit Data Pengadaan' : 'Form Pengadaan Barang Baru'"></h3>
+                <button @click="modalOpen = false" class="text-3xl">&times;</button>
+            </div>
+            
+            <form :action="editMode ? '/bmd/pengadaan/update/' + editId : '/bmd/pengadaan/save'" method="POST" class="p-10 overflow-y-auto custom-scrollbar flex flex-col space-y-10">
+                <!-- SEKSI 1: DOKUMEN -->
+                <div class="space-y-6 bg-slate-50/50 p-6 rounded-3xl border border-slate-100">
+                    <h4 class="font-black text-blue-600 text-xs uppercase border-b border-blue-100 pb-2 flex items-center">
+                        <i class="fas fa-file-invoice mr-2"></i> I. Informasi Dokumen
+                    </h4>
+                    <div class="grid grid-cols-1 gap-4">
+                        <div><label class="block text-[10px] font-black text-slate-400 uppercase mb-1">No SPM SIPD</label><input type="text" name="no_spm" required class="w-full bg-white border border-slate-200 rounded-xl p-3 text-sm font-bold shadow-sm"></div>
+                        <div><label class="block text-[10px] font-black text-slate-400 uppercase mb-1">Program</label><input type="text" name="program" class="w-full bg-white border border-slate-200 rounded-xl p-3 text-sm font-bold shadow-sm"></div>
+                        <div><label class="block text-[10px] font-black text-slate-400 uppercase mb-1">Kegiatan</label><input type="text" name="kegiatan" class="w-full bg-white border border-slate-200 rounded-xl p-3 text-sm font-bold shadow-sm"></div>
+                        <div><label class="block text-[10px] font-black text-slate-400 uppercase mb-1">Kode Prog/Keg</label><input type="text" name="kode_prog_keg" class="w-full bg-white border border-slate-200 rounded-xl p-3 text-sm font-bold shadow-sm"></div>
+                    </div>
+                </div>
+
+                <!-- SEKSI 2: ASET & REFERENSI -->
+                <div class="space-y-6 bg-emerald-50/30 p-6 rounded-3xl border border-emerald-100">
+                    <h4 class="font-black text-emerald-600 text-xs uppercase border-b border-emerald-100 pb-2 flex items-center">
+                        <i class="fas fa-box-open mr-2"></i> II. Detail Aset & Referensi
+                    </h4>
+                    <div class="grid grid-cols-1 gap-4">
+                        <div class="select2-container-wrapper">
+                            <label class="block text-[10px] font-black text-slate-400 uppercase mb-1">Cari Referensi Belanja/Aset</label>
+                            <select id="ref_select" class="js-example-basic-single w-full" onchange="fillRef(this)">
+                                <option value="">-- Ketik Kode atau Uraian --</option>
+                                {% for r in referensi %}
+                                <option value="{{ r.id }}" data-kb="{{ r.kode_belanja }}" data-nb="{{ r.uraian_belanja }}" data-ka="{{ r.rek_aset }}" data-ua="{{ r.nama_asset }}">
+                                    [{{ r.kode_belanja }}] {{ r.uraian_belanja }} | Aset: {{ r.nama_asset }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <input type="hidden" name="kode_rek_belanja" id="k_rek">
+                        <input type="hidden" name="nama_rek_belanja" id="n_rek">
+                        <input type="hidden" name="kode_belanja_x_aset" id="k_aset">
+                        <input type="hidden" name="uraian_belanja_aset" id="u_aset">
+                        
+                        <div><label class="block text-[10px] font-black text-slate-400 uppercase mb-1">Nama Aset</label><input type="text" name="nama_aset" required class="w-full bg-white border border-slate-200 rounded-xl p-3 text-sm font-bold shadow-sm"></div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div><label class="block text-[10px] font-black text-slate-400 uppercase mb-1">Merk</label><input type="text" name="merk" class="w-full bg-white border border-slate-200 rounded-xl p-3 text-sm font-bold shadow-sm"></div>
+                            <div><label class="block text-[10px] font-black text-slate-400 uppercase mb-1">Type</label><input type="text" name="type" class="w-full bg-white border border-slate-200 rounded-xl p-3 text-sm font-bold shadow-sm"></div>
+                        </div>
+                        <div><label class="block text-[10px] font-black text-slate-400 uppercase mb-1">Ukuran / CC</label><input type="text" name="ukuran_cc" class="w-full bg-white border border-slate-200 rounded-xl p-3 text-sm font-bold shadow-sm"></div>
+                    </div>
+                </div>
+
+                <!-- SEKSI 3: FINANSIAL & BAST -->
+                <div class="space-y-6 bg-purple-50/30 p-6 rounded-3xl border border-purple-100">
+                    <h4 class="font-black text-purple-600 text-xs uppercase border-b border-purple-100 pb-2 flex items-center">
+                        <i class="fas fa-coins mr-2"></i> III. Finansial & BAST
+                    </h4>
+                    <div class="grid grid-cols-1 gap-6">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div><label class="block text-[10px] font-black text-slate-400 uppercase mb-1">QTY</label><input type="number" name="qty" x-model.number="qty" required class="w-full bg-white border border-slate-200 rounded-xl p-4 text-lg font-black text-blue-600 shadow-sm"></div>
+                            <div><label class="block text-[10px] font-black text-slate-400 uppercase mb-1">Harga Satuan</label><input type="text" name="harga_satuan" x-model="harga" required class="w-full bg-white border border-slate-200 rounded-xl p-4 text-lg font-black text-blue-600 shadow-sm"></div>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="bg-blue-600 p-5 rounded-2xl text-white shadow-xl shadow-blue-900/20">
+                                <p class="text-[9px] font-black uppercase opacity-70 mb-1">Otomatis Jumlah Total</p>
+                                <p class="text-xl font-black" x-text="new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(jumlahTotal)"></p>
+                            </div>
+                            <div class="bg-slate-900 p-5 rounded-2xl text-white shadow-xl shadow-slate-900/20 border border-slate-800">
+                                <p class="text-[9px] font-black uppercase text-emerald-400 mb-1">Total Pengadaan (Final)</p>
+                                <p class="text-xl font-black" x-text="new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(totalPengadaan)"></p>
+                            </div>
+                        </div>
+
+                        <div><label class="block text-[10px] font-black text-slate-400 uppercase mb-1">Biaya Umum & Pajak</label><input type="text" name="biaya_umum_pajak" x-model="pajak" class="w-full bg-white border border-slate-200 rounded-xl p-3 text-sm font-bold shadow-sm"></div>
+                        <div><label class="block text-[10px] font-black text-slate-400 uppercase mb-1">Tanggal BAST</label><input type="date" name="tgl_bast_dok" required class="w-full bg-white border border-slate-200 rounded-xl p-3 text-sm font-bold shadow-sm"></div>
+                        <div><label class="block text-[10px] font-black text-slate-400 uppercase mb-1">Nomor BAST / DOK</label><input type="text" name="no_bast_dok" required placeholder="Contoh: 050/123/BAST/2026" class="w-full bg-white border border-slate-200 rounded-xl p-3 text-sm font-bold shadow-sm"></div>
+                        <div><label class="block text-[10px] font-black text-slate-400 uppercase mb-1">Link Foto Barang</label><input type="text" name="link_foto" placeholder="URL Foto..." class="w-full bg-white border border-slate-200 rounded-xl p-3 text-sm font-bold shadow-sm"></div>
+                        <div><label class="block text-[10px] font-black text-slate-400 uppercase mb-1">Link Video Barang</label><input type="text" name="link_video" placeholder="URL Video..." class="w-full bg-white border border-slate-200 rounded-xl p-3 text-sm font-bold shadow-sm"></div>
+                        <div><label class="block text-[10px] font-black text-slate-400 uppercase mb-1">Keterangan Tambahan</label><textarea name="keterangan" rows="3" class="w-full bg-white border border-slate-200 rounded-xl p-3 text-sm font-bold shadow-sm"></textarea></div>
+                    </div>
+                </div>
+
+                <div class="flex space-x-4">
+                    <button type="button" @click="modalOpen = false" class="flex-1 bg-slate-100 text-slate-400 py-5 rounded-[2rem] font-black uppercase text-sm">Batal</button>
+                    <button type="submit" class="flex-[2] bg-emerald-600 text-white py-5 rounded-[2rem] font-black uppercase text-sm shadow-2xl shadow-emerald-900/40 transform transition hover:-translate-y-1">Simpan Data Pengadaan</button>
+                </div>
+                
+                <!-- Hidden fields for other columns to match schema -->
+                <input type="hidden" name="no_rangka" value="-">
+                <input type="hidden" name="no_mesin" value="-">
+                <input type="hidden" name="no_pol" value="-">
+                <input type="hidden" name="no_bpkb" value="-">
+                <input type="hidden" name="lokasi_ruang" value="-">
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+function fillRef(sel) {
+    const opt = sel.options[sel.selectedIndex];
+    if(!opt.value) return;
+    document.getElementById('k_rek').value = opt.getAttribute('data-kb');
+    document.getElementById('n_rek').value = opt.getAttribute('data-nb');
+    document.getElementById('k_aset').value = opt.getAttribute('data-ka');
+    document.getElementById('u_aset').value = opt.getAttribute('data-ua');
+}
+
+$(document).ready(function() {
+    $('.js-example-basic-single').select2({
+        dropdownParent: $('#ref_select').parent()
+    });
+});
+
+function openEdit(id) {
+    fetch('/bmd/pengadaan/detail/' + id)
+        .then(r => r.json())
+        .then(data => {
+            // Gunakan selector yang lebih spesifik untuk populate modal
+            document.getElementsByName('no_spm')[0].value = data.no_spm;
+            document.getElementsByName('program')[0].value = data.program;
+            document.getElementsByName('kegiatan')[0].value = data.kegiatan;
+            document.getElementsByName('kode_prog_keg')[0].value = data.kode_prog_keg;
+            document.getElementsByName('nama_aset')[0].value = data.nama_aset;
+            document.getElementsByName('merk')[0].value = data.merk;
+            document.getElementsByName('type')[0].value = data.type;
+            document.getElementsByName('ukuran_cc')[0].value = data.ukuran_cc;
+            document.getElementsByName('tgl_bast_dok')[0].value = data.tgl_bast_dok;
+            document.getElementsByName('no_bast_dok')[0].value = data.no_bast_dok;
+            document.getElementsByName('link_foto')[0].value = data.link_foto;
+            document.getElementsByName('link_video')[0].value = data.link_video;
+            document.getElementsByName('keterangan')[0].value = data.keterangan;
+            
+            // Re-sync Alpine state
+            const mainDiv = document.querySelector('[x-data]');
+            if (mainDiv.__x) {
+                mainDiv.__x.$data.editMode = true;
+                mainDiv.__x.$data.editId = id;
+                mainDiv.__x.$data.qty = data.qty;
+                mainDiv.__x.$data.harga = data.harga_satuan;
+                mainDiv.__x.$data.pajak = data.biaya_umum_pajak;
+                mainDiv.__x.$data.modalOpen = true;
+            }
+            
+            document.getElementById('k_rek').value = data.kode_rek_belanja;
+            document.getElementById('n_rek').value = data.nama_rek_belanja;
+            document.getElementById('k_aset').value = data.kode_belanja_x_aset;
+            document.getElementById('u_aset').value = data.uraian_belanja_aset;
+        });
+}
+</script>
+{% endblock %}

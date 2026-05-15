@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="bg-white p-10 rounded-[2.5rem] shadow-sm border border-gray-200">
+    <div class="flex items-center space-x-6 mb-10">
+        <div class="bg-blue-100 p-4 rounded-2xl text-blue-600">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>
+        </div>
+        <div>
+            <h2 class="text-3xl font-black text-slate-800 uppercase tracking-tighter">Referensi Mapping T-W</h2>
+            <p class="text-slate-500 text-sm font-medium">Relasi Kode Belanja SIPD dengan Kode Rekening Aset Daerah.</p> 
+        </div>
+    </div>
+
+    <!-- SEARCH BOX -->
+    <form action="/bmd/referensi" method="GET" class="bg-slate-50 p-8 rounded-[2.5rem] border border-slate-100 mb-10 shadow-inner">
+        <div class="flex flex-col md:flex-row gap-4">
+            <input type="text" name="q" value="{{ query }}" placeholder="Cari Kode Belanja / Nama Barang..." class="flex-1 bg-white border-0 rounded-2xl p-4 shadow-sm focus:ring-2 focus:ring-blue-500 outline-none font-bold">
+            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-10 py-4 rounded-2xl font-black text-lg shadow-xl transition transform hover:-translate-y-1">
+                🔍 JALANKAN RADAR MAPPING
+            </button>
+        </div>
+    </form>
+
+    <!-- RESULTS TABLE -->
+    <div class="overflow-x-auto rounded-[2.5rem] border border-slate-100 shadow-sm overflow-hidden">
+        <table class="min-w-full bg-white">
+            <thead>
+                <tr class="bg-slate-900 text-white text-[10px] uppercase tracking-widest">
+                    <th class="py-6 px-6 text-left">Kode & Nama Belanja (SIPD)</th>
+                    <th class="py-6 px-6 text-left">Mapping Rekening Aset</th>
+                </tr>
+            </thead>
+            <tbody class="text-slate-600 text-sm">
+                {% for item in results %}
+                <tr class="border-b border-slate-50 hover:bg-blue-50/50 transition">
+                    <td class="py-5 px-6 border-r border-slate-50">
+                        <p class="font-black text-slate-800 tracking-tighter">{{ item.kode_belanja }}</p>
+                        <p class="text-[11px] text-slate-500 font-bold uppercase leading-tight">{{ item.nama_belanja }}</p>
+                    </td>
+                    <td class="py-5 px-6">
+                        <div class="flex items-center space-x-3">
+                            <div class="bg-blue-50 p-2 rounded-lg text-blue-600 font-mono font-black text-xs">
+                                {{ item.kode_aset }}
+                            </div>
+                            <p class="font-black text-slate-700 uppercase text-[11px] leading-tight">
+                                {{ item.nama_aset }}
+                            </p>
+                        </div>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="2" class="py-24 text-center">
+                        <p class="text-slate-400 font-black uppercase tracking-widest text-xs italic">Radar siap mencari mapping, silakan masukkan kata kunci Jendral.</p>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
