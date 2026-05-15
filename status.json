@@ -1,0 +1,550 @@
+{
+    "tasks": [
+        {
+            "id": 1,
+            "prioritas": "Khusus",
+            "deadline": "2026-04-30",
+            "kategori": "Keuangan",
+            "uraian": "EPurchasing - Inaproch tahap penerimaan Pesanan dan BAPP",
+            "created_at": "2026-04-27 02:42:53",
+            "completed_at": "2026-04-29",
+            "duration_minutes": 10
+        },
+        {
+            "id": 2,
+            "prioritas": "P3",
+            "deadline": "2026-04-27",
+            "kategori": "Asset",
+            "uraian": "Rekap BMD bukan dari belanja Modal Pemeliharaan - Identifikasi Dokumen dan Kelengkapan Foto Reklas Pemeliharaan",
+            "created_at": "2026-04-27 07:52:48",
+            "completed_at": "2026-04-28",
+            "duration_minutes": 45
+        },
+        {
+            "id": 3,
+            "prioritas": "P1",
+            "deadline": "2026-04-30",
+            "kategori": "Asset",
+            "uraian": "Rekap BMD bukan dari belanja Modal Pemeliharaan - Cetak dokumen dan Koordinasi dengan kasubag umpeg Kecocokan dokumen dan barang Reklasifikasi Dari pemeliharaan",
+            "created_at": "2026-04-27 08:18:33",
+            "completed_at": "2026-04-28",
+            "duration_minutes": 55
+        },
+        {
+            "id": 4,
+            "prioritas": "P1",
+            "deadline": "2026-04-28",
+            "kategori": "Asset",
+            "uraian": "Pemeliharaan Kendaraan DInas (Milik Bu ratna ,kasi statistika)",
+            "created_at": "2026-04-28 02:15:59",
+            "completed_at": "2026-04-28",
+            "duration_minutes": 75
+        },
+        {
+            "id": 5,
+            "prioritas": "P1",
+            "deadline": "2026-04-30",
+            "kategori": "PEP",
+            "uraian": "Upload Bukti dukung E-Sakip",
+            "created_at": "2026-04-28 07:55:25",
+            "completed_at": "2026-04-28",
+            "duration_minutes": 30
+        },
+        {
+            "id": 6,
+            "prioritas": "P3",
+            "deadline": "2026-04-28",
+            "kategori": "Keuangan",
+            "uraian": "Menghitung BPJS Non ASN Iuranya",
+            "created_at": "2026-04-28 08:02:31",
+            "completed_at": "2026-04-28",
+            "duration_minutes": 15
+        },
+        {
+            "id": 7,
+            "prioritas": "P1",
+            "deadline": "2026-04-29",
+            "kategori": "PEP",
+            "uraian": "E-Sakip - Laporan dan Koordinasi bukti dukung teruoload",
+            "created_at": "2026-04-28 11:44:08",
+            "completed_at": "2026-04-29",
+            "duration_minutes": 45
+        },
+        {
+            "id": 8,
+            "prioritas": "Khusus",
+            "deadline": "2026-04-30",
+            "kategori": "PEP",
+            "uraian": "E-SAKIP - Pengisian bukti dukung (Folder)",
+            "created_at": "2026-04-29 01:52:59",
+            "completed_at": "2026-04-29",
+            "duration_minutes": 60
+        },
+        {
+            "id": 9,
+            "prioritas": "Khusus",
+            "deadline": "2026-04-30",
+            "kategori": "Keuangan",
+            "uraian": "E-Phurcasing - Menunggu (approve BAPP) TTD Ibu Kepala , Baru Masuk Langkah Selanjutnya (Koordinasi minta Arrahan Pimp)",
+            "created_at": "2026-04-29 12:29:42",
+            "completed_at": "2026-04-30",
+            "duration_minutes": 15
+        },
+        {
+            "id": 10,
+            "prioritas": "Khusus",
+            "deadline": "2026-04-30",
+            "kategori": "Kepegawaian",
+            "uraian": "Memroses User Name dibuat untuk E-dabu",
+            "created_at": "2026-04-26 08:01:28",
+            "completed_at": "2026-05-04",
+            "duration_minutes": 30
+        },
+        {
+            "id": 11,
+            "prioritas": "P3",
+            "deadline": "2026-04-28",
+            "kategori": "Asset",
+            "uraian": "Rekap BMD bukan dari belanja Modal Pemeliharaan - Monitoring Reklas Pemeliharaan (Menunggu Surat pak Nur ,Baru TL)",
+            "created_at": "2026-04-26 09:19:24",
+            "completed_at": "2026-05-01",
+            "duration_minutes": 45
+        },
+        {
+            "id": 12,
+            "prioritas": "P1",
+            "deadline": "2026-05-04",
+            "kategori": "Kepegawaian",
+            "uraian": "Pemrosesan Akun E-Dabu",
+            "created_at": "2026-04-28 07:56:04",
+            "completed_at": "2026-05-03",
+            "duration_minutes": 30
+        },
+        {
+            "id": 13,
+            "prioritas": "Khusus",
+            "deadline": "2026-04-29",
+            "kategori": "Keuangan",
+            "uraian": "Koordinasi - Pemabayaran,Cap dan TTD Bengkel",
+            "created_at": "2026-04-28 11:54:23",
+            "completed_at": "2026-05-01",
+            "duration_minutes": 45
+        },
+        {
+            "id": 14,
+            "prioritas": "Khusus",
+            "deadline": "2026-04-30",
+            "kategori": "PEP",
+            "uraian": "E-SAKIP - Pengisian bukti dukung (Data)",
+            "created_at": "2026-04-29 05:02:03",
+            "completed_at": "2026-05-04",
+            "duration_minutes": 75
+        },
+        {
+            "id": 15,
+            "prioritas": "Khusus",
+            "deadline": "2026-04-30",
+            "kategori": "Kepegawaian",
+            "uraian": "Mengevaluasi Tugas Tugas Kinerja Mandiri",
+            "created_at": "2026-04-30 01:54:37",
+            "completed_at": "2026-04-30",
+            "duration_minutes": 15
+        },
+        {
+            "id": 16,
+            "prioritas": "Khusus",
+            "deadline": "2026-04-30",
+            "kategori": "Keuangan",
+            "uraian": "E-Phurcasing - Inaproch Melanjutkan proses setelah TTD PA",
+            "created_at": "2026-04-30 02:15:09",
+            "completed_at": "2026-04-30",
+            "duration_minutes": 45
+        },
+        {
+            "id": 17,
+            "prioritas": "P1",
+            "deadline": "2026-05-04",
+            "kategori": "Keuangan",
+            "uraian": "E-Phurcasing - Inaproch Melanjutkan proses setelah Invoice terbit dari Penyedia",
+            "created_at": "2026-04-30 03:38:22",
+            "completed_at": "2026-05-04",
+            "duration_minutes": 120
+        },
+        {
+            "id": 18,
+            "prioritas": "P3",
+            "deadline": "2026-04-30",
+            "kategori": "Keuangan",
+            "uraian": "E-Phurchasing - Koordinasi Virtual Dengan Intisarana Pemrosesan Invoice Termin 2 jasa Keamanan",
+            "created_at": "2026-04-30 03:39:44",
+            "completed_at": "2026-04-30",
+            "duration_minutes": 5
+        },
+        {
+            "id": 19,
+            "prioritas": "Khusus",
+            "deadline": "2026-05-04",
+            "kategori": "Keuangan",
+            "uraian": "LAPORAN -  rapat Pergeseran perubahan ",
+            "created_at": "2026-05-03 10:43:18",
+            "completed_at": "2026-05-05",
+            "duration_minutes": 30
+        },
+        {
+            "id": 20,
+            "prioritas": "Khusus",
+            "deadline": "2026-05-04",
+            "kategori": "Asset",
+            "uraian": "Melakukan Pemeliharaan Pengecekan Asset berupa Laptope travelamte",
+            "created_at": "2026-05-04 06:24:31",
+            "completed_at": "2026-05-04",
+            "duration_minutes": 105
+        },
+        {
+            "id": 21,
+            "prioritas": "P1",
+            "deadline": "2026-05-04",
+            "kategori": "Kepegawaian",
+            "uraian": "Memenuhi data untuk laporan WFH personil ke BKD",
+            "created_at": "2026-05-04 06:25:06",
+            "completed_at": "2026-05-04",
+            "duration_minutes": 15
+        },
+        {
+            "id": 22,
+            "prioritas": "P1",
+            "deadline": "2026-05-04",
+            "kategori": "Keuangan",
+            "uraian": "Koordinasi Revisi Dokumen E-Purchasing Intisarana Pencarian ke -2\r\n",
+            "created_at": "2026-05-04 08:12:50",
+            "completed_at": "2026-05-04",
+            "duration_minutes": 30
+        },
+        {
+            "id": 23,
+            "prioritas": "P1",
+            "deadline": "2026-05-04",
+            "kategori": "Keuangan",
+            "uraian": "Revisi Dokumen E-Purchasing Intisarana Pencarian ke -2",
+            "created_at": "2026-05-04 08:13:10",
+            "completed_at": "2026-05-04",
+            "duration_minutes": 15
+        },
+        {
+            "id": 24,
+            "prioritas": "Khusus",
+            "deadline": "2026-05-05",
+            "kategori": "Umum",
+            "uraian": "Menunggu Konfirmasi Arahan Kasubag Umpeg Tagihan E Dabu - Lanjut Billing",
+            "created_at": "2026-05-04 08:15:08",
+            "completed_at": "2026-05-04",
+            "duration_minutes": 30
+        },
+        {
+            "id": 25,
+            "prioritas": "P2",
+            "deadline": "2026-05-11",
+            "kategori": "PEP",
+            "uraian": "E-SAKIP - Pengfolderan Bukti Dukung All Resource ",
+            "created_at": "2026-05-04 08:27:08",
+            "completed_at": "2026-04-30",
+            "duration_minutes": 45
+        },
+        {
+            "id": 26,
+            "prioritas": "Khusus",
+            "deadline": "2026-05-05",
+            "kategori": "PEP",
+            "uraian": "E-SAKIP - Pengisian bukti dukung (Data) Point C -D ",
+            "created_at": "2026-05-04 08:38:12",
+            "completed_at": "2026-05-05",
+            "duration_minutes": 105
+        },
+        {
+            "id": 27,
+            "prioritas": "Khusus",
+            "deadline": "2026-05-05",
+            "kategori": "Asset",
+            "uraian": "SIMASTER - Penggantian Pakta Integritas Di simaster dan TTD legal Dokumen ke pemegang baru",
+            "created_at": "2026-05-04 09:15:22",
+            "completed_at": "2026-05-05",
+            "duration_minutes": 60
+        },
+        {
+            "id": 28,
+            "prioritas": "Khusus",
+            "deadline": "2026-05-05",
+            "kategori": "Keuangan",
+            "uraian": "E-DABU - Pembuatan Billing Tagihan di E-dabu Follup to kasubag umpeg",
+            "created_at": "2026-05-04 09:16:31",
+            "completed_at": "2026-05-05",
+            "duration_minutes": 30
+        },
+        {
+            "id": 29,
+            "prioritas": "Khusus",
+            "deadline": "2026-05-05",
+            "kategori": "PEP",
+            "uraian": "Cheking dan Koordinasi Renja ",
+            "created_at": "2026-05-05 02:26:18",
+            "completed_at": "2026-05-05",
+            "duration_minutes": 15
+        },
+        {
+            "id": 30,
+            "prioritas": "Khusus",
+            "deadline": "2026-05-05",
+            "kategori": "Keuangan",
+            "uraian": "Pekorrdinasian Dokumen E -Phurchasing ke BPPKAD pencarian termin 2 Intisarana",
+            "created_at": "2026-05-05 03:59:35",
+            "completed_at": "2026-05-05",
+            "duration_minutes": 45
+        },
+        {
+            "id": 31,
+            "prioritas": "Khusus",
+            "deadline": "2026-05-05",
+            "kategori": "PEP",
+            "uraian": "Pendampingan Desk Renja 2027",
+            "created_at": "2026-05-05 08:19:26",
+            "completed_at": "2026-05-05",
+            "duration_minutes": 75
+        },
+        {
+            "id": 32,
+            "prioritas": "Khusus",
+            "deadline": "2026-05-17",
+            "kategori": "Kepegawaian",
+            "uraian": "Pembuatan rencana Kerja Untuk WFH Di aplikasi Masbrow",
+            "created_at": "2026-04-27 08:42:08",
+            "completed_at": "2026-05-07",
+            "duration_minutes": 45
+        },
+        {
+            "id": 33,
+            "prioritas": "Khusus",
+            "deadline": "2026-05-06",
+            "kategori": "PEP",
+            "uraian": "LAPORAN - Revisi Laporan Rapat tg 27/03/2026 dan 31/03/2026",
+            "created_at": "2026-05-05 04:52:00",
+            "completed_at": "2026-05-06",
+            "duration_minutes": 45
+        },
+        {
+            "id": 34,
+            "prioritas": "Khusus",
+            "deadline": "2026-05-06",
+            "kategori": "PEP",
+            "uraian": "Desk Renja Ke Setda Bag.Adbang,PBJ,Prokompim",
+            "created_at": "2026-05-06 05:16:10",
+            "completed_at": "2026-05-06",
+            "duration_minutes": 180
+        },
+        {
+            "id": 35,
+            "prioritas": "Khusus",
+            "deadline": "2026-05-07",
+            "kategori": "PEP",
+            "uraian": "DESK RENJA - Print Pra Renja 2027 dan Koordinasi ke BPPKAD",
+            "created_at": "2026-05-06 05:16:55",
+            "completed_at": "2026-05-07",
+            "duration_minutes": 105
+        },
+        {
+            "id": 36,
+            "prioritas": "Khusus",
+            "deadline": "2026-05-06",
+            "kategori": "PEP",
+            "uraian": "DESK RENJA - pembuatan Hasil laporan Desk ",
+            "created_at": "2026-05-06 06:57:54",
+            "completed_at": "2026-05-06",
+            "duration_minutes": 30
+        },
+        {
+            "id": 37,
+            "prioritas": "P1",
+            "deadline": "2026-05-07",
+            "kategori": "Keuangan",
+            "uraian": "TAMSIL - Ingatkan Mba desta salah kode billing Tamsil",
+            "created_at": "2026-05-06 09:04:26",
+            "completed_at": "2026-05-07",
+            "duration_minutes": 15
+        },
+        {
+            "id": 38,
+            "prioritas": "Khusus",
+            "deadline": "2026-05-11",
+            "kategori": "Keuangan",
+            "uraian": "BPJS - Cek Transaksi BPJS Pak Noor",
+            "created_at": "2026-05-11 00:29:05",
+            "completed_at": "2026-05-11",
+            "duration_minutes": 30
+        },
+        {
+            "id": 39,
+            "prioritas": "Khusus",
+            "deadline": "2026-05-11",
+            "kategori": "PEP",
+            "uraian": "SIPD - Entry Pergeseran Pra RKA 2027 Sub Keg Alat Kantor Pindah Ke Alat rumah tangga 19,009,304.00 ke Alat Rumah Tangga ",
+            "created_at": "2026-05-11 00:29:40",
+            "completed_at": "2026-05-13",
+            "duration_minutes": 45
+        },
+        {
+            "id": 40,
+            "prioritas": "P2",
+            "deadline": "2026-05-11",
+            "kategori": "Asset",
+            "uraian": "TSA - Pencatatan Pemeriksaan dan Serah Terima Barang Pengadaan Peralatan jaringan 99.661.002",
+            "created_at": "2026-05-11 01:18:22",
+            "completed_at": "2026-05-11",
+            "duration_minutes": 120
+        },
+        {
+            "id": 41,
+            "prioritas": "Khusus",
+            "deadline": "2026-05-11",
+            "kategori": "Asset",
+            "uraian": "Pemeriksaan dan Serah Terima Barang Pengadaan Peralatan jaringan 99.661.002 ",
+            "created_at": "2026-05-11 01:19:49",
+            "completed_at": "2026-05-11",
+            "duration_minutes": 60
+        },
+        {
+            "id": 42,
+            "prioritas": "Khusus",
+            "deadline": "2026-05-11",
+            "kategori": "PEP",
+            "uraian": "PEP - Laporan Kinerja Triwulan I 2026",
+            "created_at": "2026-05-11 01:24:25",
+            "completed_at": "2026-05-11",
+            "duration_minutes": 90
+        },
+        {
+            "id": 43,
+            "prioritas": "Khusus",
+            "deadline": "2026-05-12",
+            "kategori": "PEP",
+            "uraian": "SIPD - Koordinasi Pergeseran Pra RKA 2027 ",
+            "created_at": "2026-05-12 03:38:02",
+            "completed_at": "2026-05-12",
+            "duration_minutes": 30
+        },
+        {
+            "id": 44,
+            "prioritas": "P1",
+            "deadline": "2026-05-12",
+            "kategori": "PEP",
+            "uraian": "SIPD - Cheking Perhitungan Pergeseran Pra RKA 2027 ",
+            "created_at": "2026-05-12 03:38:29",
+            "completed_at": "2026-05-12",
+            "duration_minutes": 30
+        },
+        {
+            "id": 45,
+            "prioritas": "Khusus",
+            "deadline": "2026-05-12",
+            "kategori": "PEP",
+            "uraian": "SIPD - Entry Pergeseran Pra RKA 2027 Memindah dengan mengurangi 16.100.000 dari Sub Keg Pemeliharaan Gedung ke Pelayanan Umum (P3kPW SMA)",
+            "created_at": "2026-05-12 04:58:00",
+            "completed_at": "2026-05-13",
+            "duration_minutes": 15
+        },
+        {
+            "id": 46,
+            "prioritas": "Khusus",
+            "deadline": "2026-05-12",
+            "kategori": "PEP",
+            "uraian": "SIPD - Entry Pergeseran Pra RKA 2027 Menambah Anggaran P3KPW S1 dari pengelola Media Ke Pelayanan umum",
+            "created_at": "2026-05-12 04:58:53",
+            "completed_at": "2026-05-13",
+            "duration_minutes": 30
+        },
+        {
+            "id": 47,
+            "prioritas": "Khusus",
+            "deadline": "2026-05-13",
+            "kategori": "PEP",
+            "uraian": "Cheking Ulang Pra Renja 2027 hasil dek",
+            "created_at": "2026-05-13 03:47:11",
+            "completed_at": "2026-05-13",
+            "duration_minutes": 30
+        },
+        {
+            "id": 48,
+            "prioritas": "P1",
+            "deadline": "2026-05-13",
+            "kategori": "PEP",
+            "uraian": "Rapat Evran dengan BPKP di Bappeda taging Pengelolaan Media",
+            "created_at": "2026-05-13 03:48:40",
+            "completed_at": "2026-05-13",
+            "duration_minutes": 60
+        },
+        {
+            "id": 49,
+            "prioritas": "P1",
+            "deadline": "2026-05-13",
+            "kategori": "PEP",
+            "uraian": "Pembuatan Laporan Rapat Evran dengan BPKP di Bappeda taging Pengelolaan Media",
+            "created_at": "2026-05-13 03:50:49",
+            "completed_at": "2026-05-13",
+            "duration_minutes": 30
+        },
+        {
+            "id": 50,
+            "prioritas": "P1",
+            "deadline": "2026-05-13",
+            "kategori": "Umum",
+            "uraian": "Pengisian Kuisioner untuk bahan penelitian mahasisma Untid terkait SIPD\r\n",
+            "created_at": "2026-05-13 03:51:23",
+            "completed_at": "2026-05-13",
+            "duration_minutes": 15
+        }
+    ],
+    "absen": [
+        {
+            "id": 1,
+            "tanggal": "2026-05-02",
+            "kategori": "TL",
+            "jam_masuk": "07:29",
+            "jam_pulang": null,
+            "persen_potongan": 0.25,
+            "rupiah_potongan": 1996.0,
+            "alasan": "Terlewat Informasi Upacara",
+            "created_at": "2026-05-03 15:14:07"
+        },
+        {
+            "id": 2,
+            "tanggal": "2026-05-04",
+            "kategori": "TL",
+            "jam_masuk": "07:31",
+            "jam_pulang": null,
+            "persen_potongan": 0.5,
+            "rupiah_potongan": 3993.0,
+            "alasan": "Handphone Loading Saat Memuat Aplikasi",
+            "created_at": "2026-05-04 08:04:43"
+        },
+        {
+            "id": 3,
+            "tanggal": "2026-05-05",
+            "kategori": "PC",
+            "jam_masuk": "",
+            "jam_pulang": null,
+            "persen_potongan": 1.5,
+            "rupiah_potongan": 11979.0,
+            "alasan": "Handphone Ketinggalan ",
+            "created_at": "2026-05-05 07:44:54"
+        },
+        {
+            "id": 4,
+            "tanggal": "2026-05-06",
+            "kategori": "TL",
+            "jam_masuk": "07:35",
+            "jam_pulang": null,
+            "persen_potongan": 0.5,
+            "rupiah_potongan": 3993.0,
+            "alasan": "Terlambat",
+            "created_at": "2026-05-06 08:37:38"
+        }
+    ]
+}
